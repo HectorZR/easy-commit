@@ -13,6 +13,15 @@ var (
 	ErrInvalidScopeFormat = errors.New("scope contains invalid characters")
 )
 
+// WrapError adds context to an existing error.
+// If the provided error is nil, it returns nil.
+//
+// Example:
+// err := someFunction()
+//
+//	if err != nil {
+//	   return WrapError(err, "failed to execute someFunction")
+//	}
 func WrapError(err error, context string) error {
 	if err == nil {
 		return nil
