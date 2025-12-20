@@ -3,6 +3,7 @@ package cli
 import (
 	"flag"
 	"fmt"
+	"strings"
 
 	"github.com/hector/easy-commit/internal/domain"
 )
@@ -58,11 +59,38 @@ func (p *Parser) Parse(args []string) (*domain.CLIConfig, error) {
 
 // ShowHelp displays the help message with available commands.
 func (p *Parser) ShowHelp() {
-	fmt.Printf("Usage: %s <command> [options]\n", p.appName)
-	fmt.Printf("Version: %s\n", p.version)
-	fmt.Println("Available commands:")
+	var message strings.Builder
 
-	for name, cmd := range p.commands {
-		fmt.Printf(" %s - %s", name, cmd.Description)
+	message.WriteString(fmt.Sprintf("%s - Interactive Conventional Commits\n", p.appName))
+	message.WriteString("USAGE:\n")
+	message.WriteString(fmt.Sprintf("	%s [FLAGS]\n", p.appName))
+	message.WriteString("FLAGS:\n")
+	for _, flag := range []struct {
+		short string
+		long  string
+		desc  string
+	}{
+		{"-t", "--type <TYPE>", "Commit type (feat, fix, docs, style, refactor, test, chore)"},
+		{"-m", "--message <MESSAGE>", "Commit description"},
+		{"-s", "--scope <SCOPE>", "Commit scope (optional)"},
+		{"-b", "--breaking", "Mark as breaking change"},
+		{"-i", "--interactive", "Force interactive mode"},
+		{"-n", "--dry-run", "Show preview without committing"},
+		{"-h", "--help", "Show this help message"},
+		{"-v", "--version", "Show version information"},
+	} {
+		message.WriteString(fmt.Sprintf("   %-2s, %-25s %s\n", flag.short, flag.long, flag.desc))
 	}
+	message.WriteString("EXAMPLES:\n")
+	message.WriteString(fmt.Sprintf("   %s # Interactive mode\n", p.appName))
+	message.WriteString(fmt.Sprintf("   %s -t feat -m \"add user authentication\"\n", p.appName))
+	message.WriteString(fmt.Sprintf("   %s --type fix --scope auth --message \"fix login bug\"\n", p.appName))
+	message.WriteString(fmt.Sprintf("   %s --dry-run --type docs --message \"update readme\"\n", p.appName))
+	message.WriteString("\n")
+	message.WriteString("COMMIT TYPES:\n")
+
+	for _, ct := range (domain.CommitTypes{}).GetDefault() {
+		message.WriteString(fmt.Sprintf("   %-10s %s\n", ct.Name, ct.Description))
+	}
+	fmt.Print(message.String())
 }
