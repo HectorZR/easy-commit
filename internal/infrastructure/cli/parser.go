@@ -39,6 +39,10 @@ func (p *Parser) RegisterCommand(cmd *Command) {
 func (p *Parser) Parse(args []string) (*domain.CLIConfig, error) {
 	config := &domain.CLIConfig{}
 
+	if len(args) == 0 {
+		return config, config.Validate()
+	}
+
 	fs := flag.NewFlagSet("easy-commit", flag.ContinueOnError)
 	fs.StringVar(&config.TypeName, "type", "", "Commit type")
 	fs.StringVar(&config.Description, "message", "", "Commit description")
