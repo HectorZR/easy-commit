@@ -1,10 +1,11 @@
 package domain
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/hector/easy-commit/internal/shared"
 )
 
 type Commit struct {
@@ -15,14 +16,6 @@ type Commit struct {
 	Breaking    bool   // Breaking change indicator
 }
 
-var (
-	ErrBodyTooLong        = errors.New("body exceeds maximum length")
-	ErrDescriptionTooLong = errors.New("description exceeds maximum length")
-	ErrEmptyDescription   = errors.New("description cannot be empty")
-	ErrInvalidCommitType  = errors.New("invalid commit type")
-	ErrInvalidScopeFormat = errors.New("scope contains invalid characters")
-)
-
 const (
 	MaxDescriptionLength = 50
 	MaxBodyLineLength    = 72
@@ -32,19 +25,19 @@ const (
 // Validate checks if the commit adheres to Conventional Commits specification
 func (c *Commit) Validate() error {
 	if !c.Type.IsValid() {
-		return fmt.Errorf("%w: %s", ErrInvalidCommitType, c.Type.Name)
+		return shared.WrapError(shared.ErrInvalidCommitType, fmt.Sprintf("commit type: %s", c.Type.Name))
 	}
 
 	if err := c.validateDescription(); err != nil {
-		return err
+		return shared.WrapError(err, "validating commit description")
 	}
 
 	if err := c.validateScope(); err != nil {
-		return err
+		return shared.WrapError(err, "validating commit scope")
 	}
 
 	if err := c.validateBody(); err != nil {
-		return err
+		return shared.WrapError(err, "validating commit body")
 	}
 
 	return nil
@@ -97,11 +90,11 @@ func (c *Commit) HasScope() bool {
 // validateDescription checks if the description is non-empty and within length limits
 func (c *Commit) validateDescription() error {
 	if strings.TrimSpace(c.Description) == "" {
-		return ErrEmptyDescription
+		return shared.WrapError(shared.ErrEmptyDescription, "description is empty or whitespace")
 	}
 
 	if utf8.RuneCountInString(c.Description) > MaxDescriptionLength {
-		return fmt.Errorf("%w: %d characters (max %d)", ErrDescriptionTooLong, utf8.RuneCountInString(c.Description), MaxDescriptionLength)
+		return shared.WrapError(shared.ErrDescriptionTooLong, fmt.Sprintf("description length: %d characters (max %d)", utf8.RuneCountInString(c.Description), MaxDescriptionLength))
 	}
 
 	return nil
@@ -117,7 +110,7 @@ func (c *Commit) validateScope() error {
 	scope := strings.TrimSpace(c.Scope)
 
 	if scope != c.Scope || strings.ContainsAny(scope, " \t\n()") {
-		return fmt.Errorf("%w: scope should not contain whitespace or parentheses", ErrInvalidScopeFormat)
+		return shared.WrapError(shared.ErrInvalidScopeFormat, "scope contains invalid characters")
 	}
 
 	return nil
@@ -130,7 +123,7 @@ func (c *Commit) validateBody() error {
 	}
 
 	if utf8.RuneCountInString(c.Body) > MaxBodyLength {
-		return fmt.Errorf("%w: %d characters (max %d)", ErrBodyTooLong, utf8.RuneCountInString(c.Body), MaxBodyLength)
+		return shared.WrapError(shared.ErrBodyTooLong, fmt.Sprintf("body length: %d characters (max %d)", utf8.RuneCountInString(c.Body), MaxBodyLength))
 	}
 
 	return nil

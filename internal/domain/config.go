@@ -1,6 +1,10 @@
 package domain
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/hector/easy-commit/internal/shared"
+)
 
 // CLIConfig holds the configuration options for the CLI application.
 type CLIConfig struct {
@@ -31,10 +35,10 @@ func (c *CLIConfig) Validate() error {
 
 	if !c.IsInteractive() {
 		if c.TypeName == "" {
-			return ErrInvalidCommitType
+			return shared.WrapError(shared.ErrInvalidCommitType, "commit type is required")
 		}
 		if strings.TrimSpace(c.Description) == "" {
-			return ErrEmptyDescription
+			return shared.WrapError(shared.ErrEmptyDescription, "commit description is required")
 		}
 	}
 
@@ -43,7 +47,7 @@ func (c *CLIConfig) Validate() error {
 
 func (c *CLIConfig) ToCommit() (*Commit, error) {
 	if c.TypeName == "" {
-		return nil, ErrInvalidCommitType
+		return nil, shared.WrapError(shared.ErrInvalidCommitType, "commit type is required")
 	}
 
 	defaultTypes := CommitTypes{}.GetDefault()

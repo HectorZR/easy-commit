@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/hector/easy-commit/internal/domain"
+	"github.com/hector/easy-commit/internal/shared"
 )
 
 func TestCommit_Validate(t *testing.T) {
@@ -31,7 +32,7 @@ func TestCommit_Validate(t *testing.T) {
 				Description: "",
 			},
 			wantErr: true,
-			errType: domain.ErrEmptyDescription,
+			errType: shared.ErrEmptyDescription,
 		},
 		{
 			name: "description too long",
@@ -40,7 +41,7 @@ func TestCommit_Validate(t *testing.T) {
 				Description: strings.Repeat("a", 51),
 			},
 			wantErr: true,
-			errType: domain.ErrDescriptionTooLong,
+			errType: shared.ErrDescriptionTooLong,
 		},
 		{
 			name: "Invalid scope format",
@@ -50,7 +51,7 @@ func TestCommit_Validate(t *testing.T) {
 				Scope:       "invalid scope",
 			},
 			wantErr: true,
-			errType: domain.ErrInvalidScopeFormat,
+			errType: shared.ErrInvalidScopeFormat,
 		},
 	}
 
@@ -306,7 +307,7 @@ func TestCLIConfig_Validate(t *testing.T) {
 				Description: "add new feature",
 			},
 			wantErr: true,
-			errType: domain.ErrInvalidCommitType,
+			errType: shared.ErrInvalidCommitType,
 		},
 		{
 			name: "non-interactive without description",
@@ -316,7 +317,7 @@ func TestCLIConfig_Validate(t *testing.T) {
 				Description: "",
 			},
 			wantErr: true,
-			errType: domain.ErrEmptyDescription,
+			errType: shared.ErrEmptyDescription,
 		},
 		{
 			name: "non-interactive with whitespace-only description",
@@ -326,7 +327,7 @@ func TestCLIConfig_Validate(t *testing.T) {
 				Description: "   \t\n   ",
 			},
 			wantErr: true,
-			errType: domain.ErrEmptyDescription,
+			errType: shared.ErrEmptyDescription,
 		},
 		{
 			name: "empty type and description triggers interactive",
@@ -421,7 +422,7 @@ func TestCLIConfig_ToCommit(t *testing.T) {
 				Description: "some description",
 			},
 			wantErr:   true,
-			errType:   domain.ErrInvalidCommitType,
+			errType:   shared.ErrInvalidCommitType,
 			expectNil: true,
 		},
 		{
@@ -431,7 +432,7 @@ func TestCLIConfig_ToCommit(t *testing.T) {
 				Description: "some description",
 			},
 			wantErr:   true,
-			errType:   domain.ErrInvalidCommitType,
+			errType:   shared.ErrInvalidCommitType,
 			expectNil: true,
 		},
 		{
@@ -441,7 +442,7 @@ func TestCLIConfig_ToCommit(t *testing.T) {
 				Description: "",
 			},
 			wantErr:   true,
-			errType:   domain.ErrEmptyDescription,
+			errType:   shared.ErrEmptyDescription,
 			expectNil: false, // ToCommit creates the commit first, then validates
 		},
 		{
@@ -451,7 +452,7 @@ func TestCLIConfig_ToCommit(t *testing.T) {
 				Description: strings.Repeat("a", 51), // Max is 50
 			},
 			wantErr:   true,
-			errType:   domain.ErrDescriptionTooLong,
+			errType:   shared.ErrDescriptionTooLong,
 			expectNil: false, // ToCommit creates the commit first, then validates
 		},
 		{
@@ -462,7 +463,7 @@ func TestCLIConfig_ToCommit(t *testing.T) {
 				Scope:       "invalid scope", // Contains space
 			},
 			wantErr:   true,
-			errType:   domain.ErrInvalidScopeFormat,
+			errType:   shared.ErrInvalidScopeFormat,
 			expectNil: false, // ToCommit creates the commit first, then validates
 		},
 	}

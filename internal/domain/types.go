@@ -1,6 +1,10 @@
 package domain
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/hector/easy-commit/internal/shared"
+)
 
 // CommitType represents a type of commit according to Conventional Commits specification.
 type CommitType struct {
@@ -70,7 +74,7 @@ func (cts CommitTypes) GetByName(name string) (CommitType, error) {
 
 		}
 	}
-	return CommitType{}, ErrInvalidCommitType
+	return CommitType{}, shared.WrapError(shared.ErrInvalidCommitType, "commit type not found")
 }
 
 // GetDefault returns the default set of commit types.
