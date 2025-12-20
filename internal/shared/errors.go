@@ -11,6 +11,7 @@ var (
 	ErrEmptyDescription   = errors.New("description cannot be empty")
 	ErrInvalidCommitType  = errors.New("invalid commit type")
 	ErrInvalidScopeFormat = errors.New("scope contains invalid characters")
+	ErrGitCommandFailed   = errors.New("git command execution failed")
 )
 
 // WrapError adds context to an existing error.
