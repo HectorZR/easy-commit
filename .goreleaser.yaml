@@ -1,0 +1,156 @@
+# GoReleaser configuration for easy-commit
+# https://goreleaser.com
+
+project_name: easy-commit
+
+# Hooks to run before building
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+# Build configuration
+builds:
+  - id: easy-commit
+    main: ./cmd/easy-commit
+    binary: easy-commit
+    
+    # Inject version information via ldflags
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.builtBy=goreleaser
+    
+    # Target platforms
+    goos:
+      - linux
+      - darwin
+      - windows
+    
+    goarch:
+      - amd64
+      - arm64
+    
+    # Ignore unsupported combinations
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+# Archive configuration
+archives:
+  - id: easy-commit-archive
+    format: tar.gz
+    
+    # Use zip for Windows
+    format_overrides:
+      - goos: windows
+        format: zip
+    
+    # Archive file name template
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    
+    # Additional files to include in archives
+    files:
+      - LICENSE.md
+      - README.md
+      - .easy-commit.example.yaml
+
+# Checksum configuration
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+  algorithm: sha256
+
+# Snapshot builds (for testing without publishing)
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+# Changelog configuration
+changelog:
+  use: git
+  sort: asc
+  
+  # Group commits by type
+  groups:
+    - title: "Features"
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: "Bug Fixes"
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 1
+    - title: "Performance Improvements"
+      regexp: "^.*perf[(\\w)]*:+.*$"
+      order: 2
+    - title: "Refactors"
+      regexp: "^.*refactor[(\\w)]*:+.*$"
+      order: 3
+    - title: "Documentation"
+      regexp: "^.*docs[(\\w)]*:+.*$"
+      order: 4
+    - title: "Build & CI"
+      regexp: "^.*(build|ci)[(\\w)]*:+.*$"
+      order: 5
+    - title: "Others"
+      order: 999
+  
+  # Exclude certain commit types from changelog
+  filters:
+    exclude:
+      - "^chore:"
+      - "^test:"
+      - "^style:"
+      - "^Merge"
+
+# GitHub Release configuration
+release:
+  github:
+    owner: HectorZR
+    name: easy-commit
+  
+  # Publish immediately (not as draft)
+  draft: false
+  
+  # Auto-detect prerelease versions (alpha, beta, rc)
+  prerelease: auto
+  
+  # Replace existing release if it exists
+  mode: replace
+  
+  # Custom release notes header
+  header: |
+    ## Easy Commit {{ .Tag }} 🎉
+    
+    A CLI tool for creating Conventional Commits with an interactive TUI powered by Bubble Tea.
+    
+    ### Installation
+    
+    Download the appropriate binary for your platform from the assets below.
+  
+  # Custom release notes footer
+  footer: |
+    ---
+    
+    **Full Changelog**: https://github.com/HectorZR/easy-commit/compare/{{ .PreviousTag }}...{{ .Tag }}
+    
+    ### Alternative Installation Methods
+    
+    **Go Install:**
+    ```bash
+    go install github.com/hector/easy-commit/cmd/easy-commit@{{ .Tag }}
+    ```
+    
+    **Build from Source:**
+    ```bash
+    git clone https://github.com/HectorZR/easy-commit.git
+    cd easy-commit
+    git checkout {{ .Tag }}
+    make build
+    ```
+    
+    ### Verify Checksums
+    
+    Download `easy-commit_{{ .Version }}_checksums.txt` and verify your binary:
+    ```bash
+    sha256sum -c easy-commit_{{ .Version }}_checksums.txt
+    ```

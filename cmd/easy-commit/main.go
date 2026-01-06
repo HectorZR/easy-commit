@@ -15,7 +15,12 @@ import (
 	"github.com/hector/easy-commit/internal/shared"
 )
 
-const version = "1.0.0"
+var (
+	version = "dev"     // Version (overridden by goreleaser)
+	commit  = "none"    // Git commit hash
+	date    = "unknown" // Build date
+	builtBy = "unknown" // Builder (goreleaser/local)
+)
 
 func main() {
 	// Cargar configuración
@@ -38,7 +43,7 @@ func main() {
 
 	// Handle version
 	if cliConfig.Version {
-		fmt.Printf("easy-commit version %s\n", version)
+		fmt.Printf("easy-commit %s (%s) built on %s by %s\n", version, commit, date, builtBy)
 		return
 	}
 

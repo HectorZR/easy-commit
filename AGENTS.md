@@ -263,6 +263,279 @@ Or check the code directly:
 - [Bubble Tea Documentation](https://github.com/charmbracelet/bubbletea)
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Go Concurrency Patterns](https://go.dev/blog/pipelines)
+- [GoReleaser Documentation](https://goreleaser.com/)
+- [Semantic Versioning](https://semver.org/)
+
+## Release Process
+
+### Versioning Strategy
+
+This project follows **Semantic Versioning 2.0.0** (MAJOR.MINOR.PATCH):
+- **MAJOR** (v2.0.0): Breaking changes, incompatible API changes
+- **MINOR** (v1.1.0): New features, backwards compatible
+- **PATCH** (v1.0.1): Bug fixes, backwards compatible
+
+Version is injected at build-time using ldflags. **Never hardcode version in code.**
+
+### Build-Time Version Injection
+
+The version information is stored in variables that are overridden during build:
+
+```go
+// cmd/easy-commit/main.go
+var (
+    version = "dev"      // Default for development builds
+    commit  = "none"     // Git commit hash
+    date    = "unknown"  // Build date
+    builtBy = "unknown"  // Builder (goreleaser/local/manual)
+)
+```
+
+**Local builds:**
+```bash
+# Development build (version=dev)
+make build
+
+# Simulated release build
+make build-release VERSION=v1.0.0
+
+# Manual with all flags
+go build -ldflags "\
+  -X main.version=v1.0.0 \
+  -X main.commit=$(git rev-parse --short HEAD) \
+  -X main.date=$(date -u '+%Y-%m-%d_%H:%M:%S') \
+  -X main.builtBy=manual" \
+  ./cmd/easy-commit
+```
+
+**Production builds (GoReleaser):**
+GoReleaser automatically injects the correct values for all variables.
+
+### Release Workflow
+
+**1. Development Phase**
+```bash
+# Commit using Conventional Commits
+git commit -m "feat: add new validation rule"
+git commit -m "fix: resolve scope parsing issue"
+git commit -m "docs: update installation instructions"
+```
+
+**2. Prepare for Release**
+```bash
+# Ensure you're on main branch
+git checkout main
+git pull origin main
+
+# Verify tests pass
+make test
+
+# (Optional) Test local build
+make build
+./easy-commit --version
+```
+
+**3. Create Release**
+```bash
+# Decide version based on commits since last release:
+# - Only bug fixes? → Patch (v1.0.1)
+# - New features? → Minor (v1.1.0)
+# - Breaking changes? → Major (v2.0.0)
+
+# Create annotated tag
+git tag -a v1.0.1 -m "Release v1.0.1: Bug fixes and improvements"
+
+# Push tag (triggers GitHub Actions release workflow)
+git push origin v1.0.1
+```
+
+**4. Automated CI/CD Process**
+
+GitHub Actions automatically:
+1. ✅ Runs all tests (unit, integration, race detector)
+2. ✅ Builds binaries for 5 platforms:
+   - Linux (amd64, arm64)
+   - macOS (amd64, arm64)
+   - Windows (amd64)
+3. ✅ Generates CHANGELOG from commits
+4. ✅ Creates compressed archives (.tar.gz, .zip)
+5. ✅ Generates SHA256 checksums
+6. ✅ Creates GitHub Release
+7. ✅ Uploads all artifacts
+
+**5. Post-Release Verification**
+```bash
+# Check release on GitHub
+open https://github.com/HectorZR/easy-commit/releases
+
+# Test installation via go install
+go install github.com/hector/easy-commit/cmd/easy-commit@v1.0.1
+
+# Verify version
+easy-commit --version
+# Output: easy-commit v1.0.1 (abc123f) built on 2026-01-06_10:30:00 by goreleaser
+
+# Download and verify binary
+curl -LO https://github.com/HectorZR/easy-commit/releases/download/v1.0.1/easy-commit_v1.0.1_checksums.txt
+curl -LO https://github.com/HectorZR/easy-commit/releases/download/v1.0.1/easy-commit_v1.0.1_linux_amd64.tar.gz
+sha256sum -c easy-commit_v1.0.1_checksums.txt
+```
+
+### GoReleaser Configuration
+
+**Configuration file:** `.goreleaser.yaml`
+
+**Key features:**
+- Multi-platform builds with optimized binaries (`-s -w` ldflags)
+- Automatic CHANGELOG generation from Conventional Commits
+- Commit grouping by type (Features, Bug Fixes, etc.)
+- Excludes `chore:`, `test:`, `style:` from CHANGELOG
+- Checksums for integrity verification
+- Custom release notes with installation instructions
+
+**Local testing:**
+```bash
+# Install goreleaser
+brew install goreleaser/tap/goreleaser
+
+# Validate configuration
+make goreleaser-check
+
+# Test build without publishing (snapshot)
+make goreleaser-snapshot
+
+# Check artifacts
+ls -la dist/
+```
+
+### Makefile Commands
+
+Development commands available:
+
+```bash
+make help                # Show all available commands
+make build               # Build development binary (version=dev)
+make build-release       # Build release binary with version
+make install             # Install binary globally
+make run                 # Build and run
+make test                # Run all tests
+make test-race           # Run tests with race detector
+make test-coverage       # Run tests with coverage report
+make lint                # Run linter (requires golangci-lint)
+make clean               # Remove build artifacts
+make deps                # Download and tidy dependencies
+make goreleaser-check    # Validate GoReleaser config
+make goreleaser-snapshot # Test release build locally
+```
+
+### Version Determination Guidelines
+
+**Based on Conventional Commits:**
+
+| Commit Type | Version Impact | Example |
+|-------------|---------------|---------|
+| `feat:` | MINOR (v1.0.0 → v1.1.0) | New feature added |
+| `fix:` | PATCH (v1.0.0 → v1.0.1) | Bug fixed |
+| `feat!:` or `BREAKING CHANGE:` | MAJOR (v1.0.0 → v2.0.0) | API changed |
+| `docs:`, `chore:`, `style:` | No version change | Documentation only |
+
+**Examples:**
+
+```bash
+# Patch release (bug fixes only)
+git commit -m "fix: resolve parsing error in scope validation"
+git tag v1.0.1
+
+# Minor release (new features)
+git commit -m "feat: add support for custom commit templates"
+git tag v1.1.0
+
+# Major release (breaking changes)
+git commit -m "feat!: change commit service API structure"
+git tag v2.0.0
+
+# Or with footer
+git commit -m "feat: restructure validator" -m "BREAKING CHANGE: Validator interface changed"
+git tag v2.0.0
+```
+
+### Pre-release Versions
+
+For testing or preview releases:
+
+```bash
+# Alpha versions
+git tag v1.1.0-alpha.1
+git tag v1.1.0-alpha.2
+
+# Beta versions
+git tag v1.1.0-beta.1
+
+# Release candidates
+git tag v1.1.0-rc.1
+```
+
+GoReleaser automatically marks these as pre-releases on GitHub.
+
+### Continuous Integration
+
+**CI Workflow** (`.github/workflows/ci.yml`):
+- Triggers on: Push to `main`, Pull Requests
+- Runs on: Multiple Go versions (1.24, 1.25)
+- Jobs:
+  - Tests (with race detector and coverage)
+  - Build smoke test
+  - Linting (golangci-lint)
+
+**Release Workflow** (`.github/workflows/release.yml`):
+- Triggers on: Git tags matching `v*`
+- Jobs:
+  - Run full test suite
+  - Execute GoReleaser
+  - Upload artifacts (retained for 7 days)
+
+### Troubleshooting Releases
+
+**Issue: Tag already exists**
+```bash
+# Delete local tag
+git tag -d v1.0.0
+
+# Delete remote tag (careful!)
+git push origin :refs/tags/v1.0.0
+```
+
+**Issue: Release failed in CI**
+```bash
+# Check GitHub Actions logs
+open https://github.com/HectorZR/easy-commit/actions
+
+# Common causes:
+# - Tests failing
+# - GoReleaser config error
+# - Missing GITHUB_TOKEN (should be automatic)
+```
+
+**Issue: Version not injected correctly**
+```bash
+# Verify ldflags in .goreleaser.yaml
+grep -A 5 "ldflags:" .goreleaser.yaml
+
+# Test locally
+make build
+./easy-commit --version
+```
+
+### Release Checklist
+
+Before creating a release tag:
+
+- [ ] All changes merged to `main`
+- [ ] Tests pass locally (`make test`)
+- [ ] CHANGELOG.md updated (or will be auto-generated)
+- [ ] Version number decided (MAJOR.MINOR.PATCH)
+- [ ] Tag message prepared
+- [ ] Post-release announcement planned (optional)
 
 ## Questions?
 
@@ -272,3 +545,5 @@ When implementing new features:
 3. Keep business logic in application layer, not infrastructure
 4. Update tests before or alongside implementation
 5. Run full test suite before committing
+6. Use Conventional Commits for all changes
+7. Create releases using semantic version tags

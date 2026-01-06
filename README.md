@@ -1,5 +1,10 @@
 # Easy Commit CLI
 
+[![Release](https://img.shields.io/github/v/release/HectorZR/easy-commit)](https://github.com/HectorZR/easy-commit/releases)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/HectorZR/easy-commit)](https://github.com/HectorZR/easy-commit/blob/main/go.mod)
+[![CI Status](https://github.com/HectorZR/easy-commit/workflows/CI/badge.svg)](https://github.com/HectorZR/easy-commit/actions)
+[![License](https://img.shields.io/github/license/HectorZR/easy-commit)](https://github.com/HectorZR/easy-commit/blob/main/LICENSE.md)
+
 A Go CLI application to create commits following the Conventional Commits specification interactively.
 
 ## 🎯 Features
@@ -18,16 +23,55 @@ A Go CLI application to create commits following the Conventional Commits specif
 
 ## 📦 Installation
 
+### Option 1: Download Pre-built Binary (Recommended)
+
+Download the latest binary for your platform from the [releases page](https://github.com/HectorZR/easy-commit/releases/latest).
+
+**Linux/macOS:**
+```bash
+# Download (replace VERSION and PLATFORM with your choices, e.g., v1.0.0, linux_amd64)
+curl -LO https://github.com/HectorZR/easy-commit/releases/download/VERSION/easy-commit_VERSION_PLATFORM.tar.gz
+
+# Extract
+tar -xzf easy-commit_VERSION_PLATFORM.tar.gz
+
+# Move to PATH
+sudo mv easy-commit /usr/local/bin/
+
+# Verify installation
+easy-commit --version
+```
+
+**Windows (PowerShell):**
+```powershell
+# Download the .zip file from the releases page
+# Extract the archive
+# Move easy-commit.exe to a directory in your PATH
+```
+
+### Option 2: Install with Go
+
+If you have Go installed (1.24 or later):
+
+```bash
+go install github.com/hector/easy-commit/cmd/easy-commit@latest
+```
+
+### Option 3: Build from Source
+
 ```bash
 # Clone the repository
-git clone https://github.com/hector/easy-commit.git
+git clone https://github.com/HectorZR/easy-commit.git
 cd easy-commit
 
-# Build
+# Build using Makefile
+make build
+
+# Or build directly with Go
 go build -o easy-commit ./cmd/easy-commit
 
 # (Optional) Install globally
-go install ./cmd/easy-commit
+make install
 ```
 
 ## 🚀 Usage
@@ -154,14 +198,40 @@ easy-commit/
 
 ```bash
 # Run all tests
-go test ./...
+make test
+
+# With race detector
+make test-race
 
 # With coverage
-go test -cover ./...
+make test-coverage
 
 # Specific tests
 go test ./internal/domain -v
+go test ./internal/application -v
 ```
+
+## 🚀 Release Management
+
+This project uses [GoReleaser](https://goreleaser.com/) for automated releases.
+
+### For Users
+
+All releases are available on the [releases page](https://github.com/HectorZR/easy-commit/releases) with pre-built binaries for multiple platforms.
+
+### For Maintainers
+
+To create a new release:
+
+```bash
+# Create and push a semantic version tag
+git tag v1.0.1
+git push origin v1.0.1
+```
+
+GitHub Actions will automatically build and publish the release with binaries for all supported platforms.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed release guidelines.
 
 ## 🔧 Advanced Go Concepts Implemented
 
@@ -209,13 +279,3 @@ MIT License - see [LICENSE.md](LICENSE.md)
 ## 👤 Author
 
 Hector Zurga
-
-## 🎓 Educational Purpose
-
-This project was created for educational purposes to:
-- Learn concurrency patterns in Go
-- Practice Clean Architecture
-- Master Terminal UI development with Bubble Tea
-- Implement The Elm Architecture (TEA) pattern in Go
-- Build modern CLI applications with keyboard navigation
-- Implement advanced testing strategies (unit + integration)
