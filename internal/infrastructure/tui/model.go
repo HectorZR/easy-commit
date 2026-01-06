@@ -108,6 +108,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case CommitCreatedMsg:
 		if msg.Success {
 			m.currentStep = StepDone
+			m.quitting = true
+			return m, tea.Quit
 		} else {
 			m.err = msg.Error
 		}
