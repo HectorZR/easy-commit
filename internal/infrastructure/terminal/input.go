@@ -7,20 +7,21 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
+
+	"github.com/hector/easy-commit/internal/config"
 )
 
 // Input handles user input from terminal
 type Input struct {
 	scanner *bufio.Scanner
-	timeout time.Duration
+	config  *config.TimeoutsConfig
 }
 
 // NewInput creates a new Input reader
-func NewInput() *Input {
+func NewInput(cfg *config.TimeoutsConfig) *Input {
 	return &Input{
 		scanner: bufio.NewScanner(os.Stdin),
-		timeout: 30 * time.Second,
+		config:  cfg,
 	}
 }
 
@@ -44,7 +45,7 @@ func (i *Input) ReadLine(prompt string) (string, error) {
 	}()
 
 	// Wait with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), i.timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), i.config.UserInput)
 	defer cancel()
 
 	select {
@@ -53,7 +54,7 @@ func (i *Input) ReadLine(prompt string) (string, error) {
 	case err := <-errChan:
 		return "", fmt.Errorf("input error: %w", err)
 	case <-ctx.Done():
-		return "", fmt.Errorf("input timeout after %v", i.timeout)
+		return "", fmt.Errorf("input timeout after %v", i.config.UserInput)
 	}
 }
 
@@ -86,9 +87,4 @@ func (i *Input) ReadConfirmation(prompt string) bool {
 	// Empty or "y" or "yes" = true
 	// Anything else = false
 	return input == "" || input == "y" || input == "yes"
-}
-
-// SetTimeout changes the input timeout duration
-func (i *Input) SetTimeout(duration time.Duration) {
-	i.timeout = duration
 }

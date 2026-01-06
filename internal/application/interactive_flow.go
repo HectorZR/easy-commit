@@ -69,13 +69,12 @@ func (f *InteractiveFlow) Run(ctx context.Context) error {
 	breaking := f.input.ReadConfirmation("[5/5] Is this a breaking change? (y/N): ")
 
 	// Create commit object
-	commit := &domain.Commit{
-		Type:        commitType,
-		Description: description,
-		Scope:       scope,
-		Body:        body,
-		Breaking:    breaking,
-	}
+	commit := domain.NewCommit(&f.service.config.Commit)
+	commit.Type = commitType
+	commit.Description = description
+	commit.Scope = scope
+	commit.Body = body
+	commit.Breaking = breaking
 
 	// Validate before preview
 	if err := commit.Validate(); err != nil {

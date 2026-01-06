@@ -7,6 +7,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/hector/easy-commit/internal/application"
+	"github.com/hector/easy-commit/internal/config"
 	"github.com/hector/easy-commit/internal/domain"
 	"github.com/hector/easy-commit/internal/infrastructure/git"
 	"github.com/hector/easy-commit/internal/infrastructure/tui"
@@ -17,14 +18,15 @@ import (
 func TestIntegrationFullCommitFlow(t *testing.T) {
 	// Skip if not in a git repository
 	logger := shared.NewLogger(shared.ERROR)
-	gitRepo := git.NewExecutor(logger)
+	cfg := config.DefaultConfig()
+	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
 
 	if !gitRepo.IsGitRepository() {
 		t.Skip("Skipping integration test: not in a git repository")
 	}
 
-	validator := application.NewConcurrentValidator(4)
-	service := application.NewCommitService(gitRepo, validator, logger)
+	validator := application.NewConcurrentValidator(&cfg.Validator)
+	service := application.NewCommitService(gitRepo, validator, logger, cfg)
 	commitTypes := domain.CommitTypes{}.GetDefault()
 	ctx := context.Background()
 
@@ -82,14 +84,15 @@ func TestIntegrationFullCommitFlow(t *testing.T) {
 // TestIntegrationMinimalCommit tests creating a minimal commit (type + description only)
 func TestIntegrationMinimalCommit(t *testing.T) {
 	logger := shared.NewLogger(shared.ERROR)
-	gitRepo := git.NewExecutor(logger)
+	cfg := config.DefaultConfig()
+	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
 
 	if !gitRepo.IsGitRepository() {
 		t.Skip("Skipping integration test: not in a git repository")
 	}
 
-	validator := application.NewConcurrentValidator(4)
-	service := application.NewCommitService(gitRepo, validator, logger)
+	validator := application.NewConcurrentValidator(&cfg.Validator)
+	service := application.NewCommitService(gitRepo, validator, logger, cfg)
 	commitTypes := domain.CommitTypes{}.GetDefault()
 	ctx := context.Background()
 
@@ -139,14 +142,15 @@ func TestIntegrationMinimalCommit(t *testing.T) {
 // TestIntegrationBreakingChange tests creating a breaking change commit
 func TestIntegrationBreakingChange(t *testing.T) {
 	logger := shared.NewLogger(shared.ERROR)
-	gitRepo := git.NewExecutor(logger)
+	cfg := config.DefaultConfig()
+	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
 
 	if !gitRepo.IsGitRepository() {
 		t.Skip("Skipping integration test: not in a git repository")
 	}
 
-	validator := application.NewConcurrentValidator(4)
-	service := application.NewCommitService(gitRepo, validator, logger)
+	validator := application.NewConcurrentValidator(&cfg.Validator)
+	service := application.NewCommitService(gitRepo, validator, logger, cfg)
 	commitTypes := domain.CommitTypes{}.GetDefault()
 	ctx := context.Background()
 
@@ -188,14 +192,15 @@ func TestIntegrationBreakingChange(t *testing.T) {
 // TestIntegrationCommitValidation tests validation during the flow
 func TestIntegrationCommitValidation(t *testing.T) {
 	logger := shared.NewLogger(shared.ERROR)
-	gitRepo := git.NewExecutor(logger)
+	cfg := config.DefaultConfig()
+	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
 
 	if !gitRepo.IsGitRepository() {
 		t.Skip("Skipping integration test: not in a git repository")
 	}
 
-	validator := application.NewConcurrentValidator(4)
-	service := application.NewCommitService(gitRepo, validator, logger)
+	validator := application.NewConcurrentValidator(&cfg.Validator)
+	service := application.NewCommitService(gitRepo, validator, logger, cfg)
 	commitTypes := domain.CommitTypes{}.GetDefault()
 	ctx := context.Background()
 
@@ -266,14 +271,15 @@ func simulateBreakingSelection(model tui.Model, breaking bool) tui.Model {
 // TestIntegrationViewRendering tests that views render without errors
 func TestIntegrationViewRendering(t *testing.T) {
 	logger := shared.NewLogger(shared.ERROR)
-	gitRepo := git.NewExecutor(logger)
+	cfg := config.DefaultConfig()
+	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
 
 	if !gitRepo.IsGitRepository() {
 		t.Skip("Skipping integration test: not in a git repository")
 	}
 
-	validator := application.NewConcurrentValidator(4)
-	service := application.NewCommitService(gitRepo, validator, logger)
+	validator := application.NewConcurrentValidator(&cfg.Validator)
+	service := application.NewCommitService(gitRepo, validator, logger, cfg)
 	commitTypes := domain.CommitTypes{}.GetDefault()
 	ctx := context.Background()
 

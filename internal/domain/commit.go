@@ -5,6 +5,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/hector/easy-commit/internal/config"
 	"github.com/hector/easy-commit/internal/shared"
 )
 
@@ -14,13 +15,15 @@ type Commit struct {
 	Description string
 	Body        string // Optional
 	Breaking    bool   // Breaking change indicator
+	config      *config.CommitConfig
 }
 
-const (
-	MaxDescriptionLength = 72
-	MaxBodyLineLength    = 72
-	MaxBodyLength        = 500
-)
+// NewCommit creates a new commit with configuration
+func NewCommit(cfg *config.CommitConfig) *Commit {
+	return &Commit{
+		config: cfg,
+	}
+}
 
 // Validate checks if the commit adheres to Conventional Commits specification
 func (c *Commit) Validate() error {
@@ -93,8 +96,8 @@ func (c *Commit) validateDescription() error {
 		return shared.WrapError(shared.ErrEmptyDescription, "description is empty or whitespace")
 	}
 
-	if utf8.RuneCountInString(c.Description) > MaxDescriptionLength {
-		return shared.WrapError(shared.ErrDescriptionTooLong, fmt.Sprintf("description length: %d characters (max %d)", utf8.RuneCountInString(c.Description), MaxDescriptionLength))
+	if utf8.RuneCountInString(c.Description) > c.config.MaxDescriptionLength {
+		return shared.WrapError(shared.ErrDescriptionTooLong, fmt.Sprintf("description length: %d characters (max %d)", utf8.RuneCountInString(c.Description), c.config.MaxDescriptionLength))
 	}
 
 	return nil
@@ -109,7 +112,7 @@ func (c *Commit) validateScope() error {
 	// Scope should be alphanumeric and may include hyphens/underscores
 	scope := strings.TrimSpace(c.Scope)
 
-	if scope != c.Scope || strings.ContainsAny(scope, " \t\n()") {
+	if scope != c.Scope || strings.ContainsAny(scope, c.config.InvalidScopeChars) {
 		return shared.WrapError(shared.ErrInvalidScopeFormat, "scope contains invalid characters")
 	}
 
@@ -122,8 +125,8 @@ func (c *Commit) validateBody() error {
 		return nil
 	}
 
-	if utf8.RuneCountInString(c.Body) > MaxBodyLength {
-		return shared.WrapError(shared.ErrBodyTooLong, fmt.Sprintf("body length: %d characters (max %d)", utf8.RuneCountInString(c.Body), MaxBodyLength))
+	if utf8.RuneCountInString(c.Body) > c.config.MaxBodyLength {
+		return shared.WrapError(shared.ErrBodyTooLong, fmt.Sprintf("body length: %d characters (max %d)", utf8.RuneCountInString(c.Body), c.config.MaxBodyLength))
 	}
 
 	return nil
@@ -138,14 +141,14 @@ func (c *Commit) formatBody() string {
 	var formattedLines []string
 
 	for _, line := range lines {
-		if utf8.RuneCountInString(line) <= MaxBodyLineLength {
+		if utf8.RuneCountInString(line) <= c.config.MaxBodyLineLength {
 			formattedLines = append(formattedLines, line)
 		} else {
 			words := strings.Fields(line)
 			var currentLine strings.Builder
 
 			for _, word := range words {
-				if currentLine.Len()+len(word)+1 > MaxBodyLineLength {
+				if currentLine.Len()+len(word)+1 > c.config.MaxBodyLineLength {
 					formattedLines = append(formattedLines, currentLine.String())
 					currentLine.Reset()
 				}

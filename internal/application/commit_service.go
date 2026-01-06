@@ -2,8 +2,8 @@ package application
 
 import (
 	"context"
-	"time"
 
+	"github.com/hector/easy-commit/internal/config"
 	"github.com/hector/easy-commit/internal/domain"
 	"github.com/hector/easy-commit/internal/shared"
 )
@@ -12,13 +12,15 @@ type CommitService struct {
 	gitRepo   domain.GitRepository
 	validator domain.CommitValidator
 	logger    *shared.Logger
+	config    *config.Config
 }
 
-func NewCommitService(repo domain.GitRepository, validator domain.CommitValidator, logger *shared.Logger) *CommitService {
+func NewCommitService(repo domain.GitRepository, validator domain.CommitValidator, logger *shared.Logger, cfg *config.Config) *CommitService {
 	return &CommitService{
 		gitRepo:   repo,
 		validator: validator,
 		logger:    logger,
+		config:    cfg,
 	}
 }
 
@@ -39,7 +41,7 @@ func (cs *CommitService) CreateCommit(ctx context.Context, commit *domain.Commit
 	}
 
 	// 3. Validate commit with timeout
-	validateCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	validateCtx, cancel := context.WithTimeout(ctx, cs.config.Timeouts.Validation)
 	defer cancel()
 
 	if err := cs.validator.Validate(validateCtx, *commit); err != nil {
@@ -64,4 +66,9 @@ func (cs *CommitService) CreateCommit(ctx context.Context, commit *domain.Commit
 // PreviewCommit returns the formatted commit message
 func (cs *CommitService) PreviewCommit(commit *domain.Commit) string {
 	return commit.Format()
+}
+
+// GetConfig returns the service configuration
+func (cs *CommitService) GetConfig() *config.Config {
+	return cs.config
 }

@@ -5,21 +5,18 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/hector/easy-commit/internal/config"
 	"github.com/hector/easy-commit/internal/domain"
 	"github.com/hector/easy-commit/internal/shared"
 )
 
 type ConcurrentValidator struct {
-	workerCount int
+	config *config.ValidatorConfig
 }
 
-func NewConcurrentValidator(workers int) *ConcurrentValidator {
-	if workers <= 0 {
-		workers = 4
-	}
-
+func NewConcurrentValidator(cfg *config.ValidatorConfig) *ConcurrentValidator {
 	return &ConcurrentValidator{
-		workerCount: workers,
+		config: cfg,
 	}
 }
 
@@ -42,7 +39,7 @@ func (v *ConcurrentValidator) Validate(ctx context.Context, commit domain.Commit
 
 	// Start worker pool
 	var wg sync.WaitGroup
-	for i := 0; i < v.workerCount; i++ {
+	for i := 0; i < v.config.WorkerCount; i++ {
 		wg.Go(func() {
 			for {
 				select {

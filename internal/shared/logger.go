@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 type LogLevel int
@@ -97,4 +98,22 @@ func (l *Logger) Error(format string, args ...any) {
 func (l *Logger) log(level, format string, args ...any) {
 	message := fmt.Sprintf(format, args...)
 	l.logger.Printf("[%s] %s", level, message)
+}
+
+// ParseLogLevel converts string to LogLevel
+func ParseLogLevel(level string) LogLevel {
+	switch strings.ToUpper(level) {
+	case "DEBUG":
+		return DEBUG
+	case "INFO":
+		return INFO
+	case "WARN":
+		return WARN
+	case "ERROR":
+		return ERROR
+	case "SILENT":
+		return SILENT
+	default:
+		return INFO
+	}
 }

@@ -62,6 +62,13 @@ profile.out
 easy-commit
 easy-commit-*
 
+# Configuration files (keep example)
+.easy-commit.yaml
+.easy-commit.yml
+easy-commit.yaml
+easy-commit.yml
+!.easy-commit.example.yaml
+
 # Release artifacts
 releases/
 artifacts/

@@ -3,6 +3,7 @@ package domain
 import (
 	"strings"
 
+	"github.com/hector/easy-commit/internal/config"
 	"github.com/hector/easy-commit/internal/shared"
 )
 
@@ -64,6 +65,11 @@ func (c *CLIConfig) Validate() error {
 }
 
 func (c *CLIConfig) ToCommit() (*Commit, error) {
+	// Use default config for backward compatibility
+	return c.ToCommitWithConfig(&config.DefaultConfig().Commit)
+}
+
+func (c *CLIConfig) ToCommitWithConfig(cfg *config.CommitConfig) (*Commit, error) {
 	if c.TypeName == "" {
 		return nil, shared.WrapError(shared.ErrInvalidCommitType, "commit type is required")
 	}
@@ -74,13 +80,12 @@ func (c *CLIConfig) ToCommit() (*Commit, error) {
 		return nil, err
 	}
 
-	commit := &Commit{
-		Type:        commitType,
-		Scope:       c.Scope,
-		Description: c.Description,
-		Body:        c.Body,
-		Breaking:    c.Breaking,
-	}
+	commit := NewCommit(cfg)
+	commit.Type = commitType
+	commit.Scope = c.Scope
+	commit.Description = c.Description
+	commit.Body = c.Body
+	commit.Breaking = c.Breaking
 
 	return commit, commit.Validate()
 }

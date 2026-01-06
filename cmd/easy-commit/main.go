@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/hector/easy-commit/internal/application"
+	"github.com/hector/easy-commit/internal/config"
 	"github.com/hector/easy-commit/internal/domain"
 	"github.com/hector/easy-commit/internal/infrastructure/cli"
 	"github.com/hector/easy-commit/internal/infrastructure/git"
@@ -18,9 +18,12 @@ import (
 const version = "1.0.0"
 
 func main() {
+	// Cargar configuración
+	cfg := config.LoadOrDefault()
+
 	// Parse CLI arguments
 	parser := cli.NewParser("easy-commit", version)
-	config, err := parser.Parse(os.Args[1:])
+	cliConfig, err := parser.Parse(os.Args[1:])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error parsing arguments: %v\n", err)
 		parser.ShowHelp()
@@ -28,25 +31,26 @@ func main() {
 	}
 
 	// Handle help
-	if config.Help {
+	if cliConfig.Help {
 		parser.ShowHelp()
 		return
 	}
 
 	// Handle version
-	if config.Version {
+	if cliConfig.Version {
 		fmt.Printf("easy-commit version %s\n", version)
 		return
 	}
 
 	// Initialize logger
-	logger := shared.NewLogger(shared.INFO)
+	logLevel := shared.ParseLogLevel(cfg.Logger.Level)
+	logger := shared.NewLogger(logLevel)
 	logger.Info("Starting easy-commit v%s", version)
 
 	// Initialize dependencies
-	gitRepo := git.NewExecutor(logger)
-	validator := application.NewConcurrentValidator(4)
-	service := application.NewCommitService(gitRepo, validator, logger)
+	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
+	validator := application.NewConcurrentValidator(&cfg.Validator)
+	service := application.NewCommitService(gitRepo, validator, logger, cfg)
 
 	// Check if we're in a git repository
 	if !gitRepo.IsGitRepository() {
@@ -56,11 +60,11 @@ func main() {
 	}
 
 	// Create context with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeouts.Context)
 	defer cancel()
 
 	// Run appropriate mode
-	if config.IsInteractive() {
+	if cliConfig.IsInteractive() {
 		// Interactive mode with Bubble Tea TUI
 		logger.Info("Running in interactive mode with TUI")
 
@@ -95,14 +99,14 @@ func main() {
 		// Direct mode (non-interactive)
 		logger.Info("Running in direct mode")
 
-		commit, err := config.ToCommit()
+		commit, err := cliConfig.ToCommit()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error creating commit: %v\n", err)
 			os.Exit(1)
 		}
 
 		// Dry run - just show preview
-		if config.DryRun {
+		if cliConfig.DryRun {
 			fmt.Println("Preview (dry-run):")
 			fmt.Println(service.PreviewCommit(commit))
 			return

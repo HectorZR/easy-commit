@@ -5,50 +5,61 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/hector/easy-commit/internal/config"
 	"github.com/hector/easy-commit/internal/domain"
 	"github.com/hector/easy-commit/internal/shared"
 )
 
 func TestCommit_Validate(t *testing.T) {
+	cfg := config.DefaultConfig()
+
 	tests := []struct {
 		name    string
-		commit  domain.Commit
+		commit  func() *domain.Commit
 		wantErr bool
 		errType error
 	}{
 		{
 			name: "valid commit",
-			commit: domain.Commit{
-				Type:        domain.TypeFeat,
-				Description: "add user authentication",
-				Scope:       "auth",
+			commit: func() *domain.Commit {
+				c := domain.NewCommit(&cfg.Commit)
+				c.Type = domain.TypeFeat
+				c.Description = "add user authentication"
+				c.Scope = "auth"
+				return c
 			},
 			wantErr: false,
 		},
 		{
 			name: "empty description",
-			commit: domain.Commit{
-				Type:        domain.TypeFeat,
-				Description: "",
+			commit: func() *domain.Commit {
+				c := domain.NewCommit(&cfg.Commit)
+				c.Type = domain.TypeFeat
+				c.Description = ""
+				return c
 			},
 			wantErr: true,
 			errType: shared.ErrEmptyDescription,
 		},
 		{
 			name: "description too long",
-			commit: domain.Commit{
-				Type:        domain.TypeFeat,
-				Description: strings.Repeat("a", 51),
+			commit: func() *domain.Commit {
+				c := domain.NewCommit(&cfg.Commit)
+				c.Type = domain.TypeFeat
+				c.Description = strings.Repeat("a", 73)
+				return c
 			},
 			wantErr: true,
 			errType: shared.ErrDescriptionTooLong,
 		},
 		{
 			name: "Invalid scope format",
-			commit: domain.Commit{
-				Type:        domain.TypeFeat,
-				Description: "some description",
-				Scope:       "invalid scope",
+			commit: func() *domain.Commit {
+				c := domain.NewCommit(&cfg.Commit)
+				c.Type = domain.TypeFeat
+				c.Description = "some description"
+				c.Scope = "invalid scope"
+				return c
 			},
 			wantErr: true,
 			errType: shared.ErrInvalidScopeFormat,
@@ -57,7 +68,7 @@ func TestCommit_Validate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.commit.Validate()
+			err := tt.commit().Validate()
 			if tt.wantErr {
 				if err == nil {
 					t.Errorf("Expected error but got none")
@@ -75,35 +86,43 @@ func TestCommit_Validate(t *testing.T) {
 }
 
 func TestCommit_Format(t *testing.T) {
+	cfg := config.DefaultConfig()
+
 	tests := []struct {
 		name     string
-		commit   domain.Commit
+		commit   func() *domain.Commit
 		expected string
 	}{
 		{
 			name: "simple commit",
-			commit: domain.Commit{
-				Type:        domain.TypeFeat,
-				Description: "add user login",
+			commit: func() *domain.Commit {
+				c := domain.NewCommit(&cfg.Commit)
+				c.Type = domain.TypeFeat
+				c.Description = "add user login"
+				return c
 			},
 			expected: "feat: add user login",
 		},
 		{
 			name: "commit with scope",
-			commit: domain.Commit{
-				Type:        domain.TypeFix,
-				Description: "fix login bug",
-				Scope:       "auth",
+			commit: func() *domain.Commit {
+				c := domain.NewCommit(&cfg.Commit)
+				c.Type = domain.TypeFix
+				c.Description = "fix login bug"
+				c.Scope = "auth"
+				return c
 			},
 			expected: "fix(auth): fix login bug",
 		},
 		{
 			name: "breaking change",
-			commit: domain.Commit{
-				Type:        domain.TypeFeat,
-				Description: "update API endpoint",
-				Breaking:    true,
-				Body:        "body content",
+			commit: func() *domain.Commit {
+				c := domain.NewCommit(&cfg.Commit)
+				c.Type = domain.TypeFeat
+				c.Description = "update API endpoint"
+				c.Breaking = true
+				c.Body = "body content"
+				return c
 			},
 			expected: "feat!: update API endpoint\n\nbody content\n\nBREAKING CHANGE: This commit introduces a breaking change.",
 		},
@@ -111,7 +130,7 @@ func TestCommit_Format(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := tt.commit.Format()
+			result := tt.commit().Format()
 			if result != tt.expected {
 				t.Errorf("Expected %q, got %q", tt.expected, result)
 			}
@@ -449,7 +468,7 @@ func TestCLIConfig_ToCommit(t *testing.T) {
 			name: "description too long should fail validation",
 			config: domain.CLIConfig{
 				TypeName:    "feat",
-				Description: strings.Repeat("a", 51), // Max is 50
+				Description: strings.Repeat("a", 73), // Max is 72
 			},
 			wantErr:   true,
 			errType:   shared.ErrDescriptionTooLong,

@@ -40,11 +40,10 @@ func TestNewModel(t *testing.T) {
 
 // TestModelStepProgression tests stepping through the flow
 func TestModelStepProgression(t *testing.T) {
-	cfg := config.DefaultConfig()
 	logger := shared.NewLogger(shared.ERROR)
-	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
-	validator := application.NewConcurrentValidator(&cfg.Validator)
-	service := application.NewCommitService(gitRepo, validator, logger, cfg)
+	gitRepo := git.NewExecutor(logger)
+	validator := application.NewConcurrentValidator(4)
+	service := application.NewCommitService(gitRepo, validator, logger)
 	commitTypes := domain.CommitTypes{}.GetDefault()
 	ctx := context.Background()
 
@@ -77,10 +76,9 @@ func TestModelStepProgression(t *testing.T) {
 // TestModelCancellation tests cancellation
 func TestModelCancellation(t *testing.T) {
 	logger := shared.NewLogger(shared.ERROR)
-	cfg := config.DefaultConfig()
-	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
-	validator := application.NewConcurrentValidator(&cfg.Validator)
-	service := application.NewCommitService(gitRepo, validator, logger, cfg)
+	gitRepo := git.NewExecutor(logger)
+	validator := application.NewConcurrentValidator(4)
+	service := application.NewCommitService(gitRepo, validator, logger)
 	commitTypes := domain.CommitTypes{}.GetDefault()
 	ctx := context.Background()
 
@@ -107,10 +105,9 @@ func TestModelCancellation(t *testing.T) {
 // TestModelBackNavigation tests going back with Ctrl+B
 func TestModelBackNavigation(t *testing.T) {
 	logger := shared.NewLogger(shared.ERROR)
-	cfg := config.DefaultConfig()
-	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
-	validator := application.NewConcurrentValidator(&cfg.Validator)
-	service := application.NewCommitService(gitRepo, validator, logger, cfg)
+	gitRepo := git.NewExecutor(logger)
+	validator := application.NewConcurrentValidator(4)
+	service := application.NewCommitService(gitRepo, validator, logger)
 	commitTypes := domain.CommitTypes{}.GetDefault()
 	ctx := context.Background()
 
@@ -205,10 +202,9 @@ func TestConfirmationToggle(t *testing.T) {
 // TestModelCommitBuild tests building a commit through the model
 func TestModelCommitBuild(t *testing.T) {
 	logger := shared.NewLogger(shared.ERROR)
-	cfg := config.DefaultConfig()
-	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
-	validator := application.NewConcurrentValidator(&cfg.Validator)
-	service := application.NewCommitService(gitRepo, validator, logger, cfg)
+	gitRepo := git.NewExecutor(logger)
+	validator := application.NewConcurrentValidator(4)
+	service := application.NewCommitService(gitRepo, validator, logger)
 	commitTypes := domain.CommitTypes{}.GetDefault()
 	ctx := context.Background()
 
@@ -253,10 +249,9 @@ func TestModelCommitBuild(t *testing.T) {
 // TestWindowResize tests window size handling
 func TestWindowResize(t *testing.T) {
 	logger := shared.NewLogger(shared.ERROR)
-	cfg := config.DefaultConfig()
-	gitRepo := git.NewExecutor(logger, &cfg.Timeouts)
-	validator := application.NewConcurrentValidator(&cfg.Validator)
-	service := application.NewCommitService(gitRepo, validator, logger, cfg)
+	gitRepo := git.NewExecutor(logger)
+	validator := application.NewConcurrentValidator(4)
+	service := application.NewCommitService(gitRepo, validator, logger)
 	commitTypes := domain.CommitTypes{}.GetDefault()
 	ctx := context.Background()
 

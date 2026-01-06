@@ -60,14 +60,8 @@ func NewModel(
 	commitTypes domain.CommitTypes,
 	ctx context.Context,
 ) Model {
-	// Initialize commit with empty values
-	commit := &domain.Commit{
-		Type:        domain.CommitType{},
-		Description: "",
-		Scope:       "",
-		Body:        "",
-		Breaking:    false,
-	}
+	// Initialize commit with config from service
+	commit := domain.NewCommit(&service.GetConfig().Commit)
 
 	// Initialize components
 	typeList := components.NewTypeList(commitTypes, 80, 12)

@@ -4,27 +4,27 @@ import (
 	"context"
 	"os/exec"
 	"strings"
-	"time"
 
+	"github.com/hector/easy-commit/internal/config"
 	"github.com/hector/easy-commit/internal/shared"
 )
 
 type Executor struct {
-	timeout time.Duration
-	logger  *shared.Logger
+	config *config.TimeoutsConfig
+	logger *shared.Logger
 }
 
 // NewExecutor creates a new Git Executor with the provided logger.
-func NewExecutor(logger *shared.Logger) *Executor {
+func NewExecutor(logger *shared.Logger, cfg *config.TimeoutsConfig) *Executor {
 	return &Executor{
-		timeout: 5 * time.Second,
-		logger:  logger,
+		config: cfg,
+		logger: logger,
 	}
 }
 
 // IsGitRepository checks if the current directory is part of a Git repository.
 func (e *Executor) IsGitRepository() bool {
-	ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), e.config.GitCommand)
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, "git", "rev-parse", "--git-dir")
@@ -41,7 +41,7 @@ func (e *Executor) IsGitRepository() bool {
 
 // HasStagedChanges checks if there are any staged changes in the Git repository.
 func (e *Executor) HasStagedChanges() bool {
-	ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), e.config.GitCommand)
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, "git", "diff", "--cached", "--quiet")
@@ -73,7 +73,7 @@ func (e *Executor) Commit(ctx context.Context, message string) error {
 
 // GetLastCommitMessage retrieves the last commit message
 func (e *Executor) GetLastCommitMessage() (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), e.config.GitCommand)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "git", "log", "-1", "--pretty=%B")
 	output, err := cmd.Output()

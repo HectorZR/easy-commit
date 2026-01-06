@@ -1,0 +1,24 @@
+# Easy Commit Configuration File
+# Copy this to .easy-commit.yaml and customize as needed
+
+# Commit message constraints
+commit:
+  max_description_length: 72    # Maximum characters for commit description
+  max_body_line_length: 72      # Maximum characters per line in body
+  max_body_length: 500          # Maximum total characters in body
+  invalid_scope_chars: " \t\n()" # Characters not allowed in scope
+
+# Timeouts for various operations
+timeouts:
+  validation: 2s      # Timeout for commit validation
+  user_input: 30s     # Timeout waiting for user input
+  git_command: 5s     # Timeout for git commands
+  context: 5m         # Overall context timeout
+
+# Validator settings
+validator:
+  worker_count: 4     # Number of concurrent validation workers
+
+# Logger settings
+logger:
+  level: INFO         # Log level: DEBUG, INFO, WARN, ERROR, SILENT
