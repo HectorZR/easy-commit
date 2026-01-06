@@ -6,10 +6,12 @@ import (
 	"os"
 	"time"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/hector/easy-commit/internal/application"
+	"github.com/hector/easy-commit/internal/domain"
 	"github.com/hector/easy-commit/internal/infrastructure/cli"
 	"github.com/hector/easy-commit/internal/infrastructure/git"
-	"github.com/hector/easy-commit/internal/infrastructure/terminal"
+	"github.com/hector/easy-commit/internal/infrastructure/tui"
 	"github.com/hector/easy-commit/internal/shared"
 )
 
@@ -59,16 +61,36 @@ func main() {
 
 	// Run appropriate mode
 	if config.IsInteractive() {
-		// Interactive mode
-		logger.Info("Running in interactive mode")
-		input := terminal.NewInput()
-		output := terminal.NewOutput(true) // Enable colors
-		flow := application.NewInteractiveFlow(service, input, output)
+		// Interactive mode with Bubble Tea TUI
+		logger.Info("Running in interactive mode with TUI")
 
-		if err := flow.Run(ctx); err != nil {
+		// Get commit types
+		commitTypes := domain.CommitTypes{}.GetDefault()
+
+		// Create Bubble Tea model
+		model := tui.NewModel(service, commitTypes, ctx)
+
+		// Run Bubble Tea program
+		program := tea.NewProgram(model)
+		finalModel, err := program.Run()
+		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
+
+		// Check result
+		result := finalModel.(tui.Model)
+		if result.IsCancelled() {
+			fmt.Fprintf(os.Stderr, "Commit cancelled by user\n")
+			os.Exit(1)
+		}
+
+		if result.GetError() != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", result.GetError())
+			os.Exit(1)
+		}
+
+		// Success is already shown by the TUI
 	} else {
 		// Direct mode (non-interactive)
 		logger.Info("Running in direct mode")

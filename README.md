@@ -4,14 +4,17 @@ A Go CLI application to create commits following the Conventional Commits specif
 
 ## 🎯 Features
 
-- ✅ **Interactive Mode**: Step-by-step guide to create commits
+- ✅ **Interactive TUI Mode**: Modern terminal UI with keyboard navigation (powered by Bubble Tea)
+- ✅ **Arrow Key Navigation**: Navigate commit types with ↑/↓ keys
+- ✅ **Real-time Validation**: Character count and validation feedback as you type
+- ✅ **Search & Filter**: Press `/` to search through commit types
+- ✅ **Back Navigation**: Use Ctrl+B to go back and edit previous steps
 - ✅ **Direct Mode**: Create commits from command line with flags
 - ✅ **Validation**: Validates commits according to Conventional Commits
-- ✅ **Preview**: Preview the message before creating the commit
+- ✅ **Preview**: Beautiful commit preview with styled boxes
 - ✅ **Concurrency**: Concurrent validation using worker pools
 - ✅ **Clean Architecture**: Layer separation (Domain, Application, Infrastructure)
-- ✅ **Zero Dependencies**: Only uses Go standard library
-- ✅ **ANSI Colors**: Colorful and friendly interface
+- ✅ **Professional UI**: Colorful and friendly interface with lipgloss styling
 
 ## 📦 Installation
 
@@ -37,13 +40,22 @@ Simply run the command without arguments:
 ./easy-commit
 ```
 
-The CLI will guide you step by step:
-1. Select the commit type (feat, fix, docs, etc.)
-2. Enter the change description
+The CLI will guide you step by step with a modern TUI:
+
+**Navigation:**
+- **↑/↓ Arrow Keys**: Navigate through commit types
+- **/** : Search/filter commit types
+- **Enter**: Confirm selection and advance
+- **Ctrl+B**: Go back to previous step
+- **Ctrl+C / Esc**: Cancel at any time
+
+**Steps:**
+1. Select the commit type (feat, fix, docs, etc.) - with arrow key navigation
+2. Enter the change description - with real-time character count
 3. (Optional) Enter the scope
 4. (Optional) Enter the body
-5. (Optional) Mark as breaking change
-6. Preview the commit
+5. (Optional) Mark as breaking change - toggle with arrow keys or Y/N
+6. Preview the commit in a styled box
 7. Confirm to create the commit
 
 ### Direct Mode (CLI Flags)
@@ -115,13 +127,25 @@ easy-commit/
 │   │   │   └── parser.go
 │   │   ├── git/
 │   │   │   └── executor.go
-│   │   └── terminal/
-│   │       ├── input.go
-│   │       └── output.go
+│   │   ├── terminal/
+│   │   │   ├── input.go
+│   │   │   └── output.go
+│   │   └── tui/                  # NEW: Bubble Tea TUI components
+│   │       ├── model.go          # Main Bubble Tea model
+│   │       ├── views.go          # View rendering functions
+│   │       ├── messages.go       # Custom messages/events
+│   │       ├── styles.go         # Lipgloss styles
+│   │       └── components/       # Reusable UI components
+│   │           ├── type_selector.go
+│   │           ├── text_input.go
+│   │           ├── confirmation.go
+│   │           └── preview.go
 │   └── shared/                   # Shared utilities
 │       ├── errors.go
 │       └── logger.go
 └── test/                         # Tests
+    ├── integration/
+    │   └── tui_integration_test.go  # NEW: TUI integration tests
     └── internal/
         └── domain_test.go
 ```
@@ -141,23 +165,30 @@ go test ./internal/domain -v
 
 ## 🔧 Advanced Go Concepts Implemented
 
-### 1. Concurrency Patterns
+### 1. Terminal User Interface (TUI) with Bubble Tea
+- **The Elm Architecture (TEA)**: Functional reactive programming pattern
+- **Model-Update-View**: Pure functions for state management
+- **Event-driven architecture**: Handling keyboard input and window events
+- **Component composition**: Reusable UI components (list, textinput, etc.)
+
+### 2. Concurrency Patterns
 - **Worker Pool Pattern**: Concurrent validation in `validator.go`
 - Use of `goroutines`, `channels`, and `sync.WaitGroup`
 - Context for cancellation and timeouts
 
-### 2. Clean Architecture
+### 3. Clean Architecture
 - Layer separation (Domain → Application → Infrastructure)
 - Dependency Injection
 - Repository Pattern
 - Interfaces for decoupling
 
-### 3. Testing
+### 4. Testing
+- **Unit tests**: Testing individual components and models
+- **Integration tests**: Testing complete flows end-to-end
 - Table-driven tests
-- Tests with multiple cases
 - Coverage tracking
 
-### 4. Error Handling
+### 5. Error Handling
 - Custom error types
 - Error wrapping with context
 - Graceful error handling
@@ -165,6 +196,9 @@ go test ./internal/domain -v
 ## 📚 Resources
 
 - [Conventional Commits](https://www.conventionalcommits.org/)
+- [Bubble Tea Framework](https://github.com/charmbracelet/bubbletea)
+- [Bubbles Components](https://github.com/charmbracelet/bubbles)
+- [Lipgloss Styling](https://github.com/charmbracelet/lipgloss)
 - [Go Concurrency Patterns](https://go.dev/blog/pipelines)
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 
@@ -181,5 +215,7 @@ Hector Zurga
 This project was created for educational purposes to:
 - Learn concurrency patterns in Go
 - Practice Clean Architecture
-- Implement advanced testing
-- Build CLI applications without external dependencies
+- Master Terminal UI development with Bubble Tea
+- Implement The Elm Architecture (TEA) pattern in Go
+- Build modern CLI applications with keyboard navigation
+- Implement advanced testing strategies (unit + integration)
