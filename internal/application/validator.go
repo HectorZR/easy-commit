@@ -40,7 +40,9 @@ func (v *ConcurrentValidator) Validate(ctx context.Context, commit domain.Commit
 	// Start worker pool
 	var wg sync.WaitGroup
 	for i := 0; i < v.config.WorkerCount; i++ {
-		wg.Go(func() {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
 			for {
 				select {
 				case <-ctx.Done():
@@ -52,7 +54,7 @@ func (v *ConcurrentValidator) Validate(ctx context.Context, commit domain.Commit
 					results <- rule(commit)
 				}
 			}
-		})
+		}()
 	}
 
 	// Send jobs
