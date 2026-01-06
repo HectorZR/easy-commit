@@ -48,7 +48,7 @@ func (p *Parser) Parse(args []string) (*domain.CLIConfig, error) {
 	fs.StringVar(&config.Description, "message", "", "Commit description")
 	fs.StringVar(&config.Scope, "scope", "", "Commit scope")
 	fs.BoolVar(&config.Breaking, "breaking", false, "Indicate a breaking change")
-	fs.BoolVar(&config.Interactive, "interactive", true, "Run in interactive mode")
+	fs.BoolVar(&config.Interactive, "interactive", false, "Run in interactive mode")
 	fs.BoolVar(&config.DryRun, "dry-run", false, "Show the commit message without creating it")
 	fs.BoolVar(&config.Help, "help", false, "Show help message")
 	fs.BoolVar(&config.Version, "version", false, "Show version information")

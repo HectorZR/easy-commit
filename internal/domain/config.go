@@ -24,7 +24,18 @@ type CLIConfig struct {
 
 // IsInteractive determines if the CLI should run in interactive mode.
 func (c *CLIConfig) IsInteractive() bool {
-	return c.Interactive || (c.TypeName == "" && c.Description == "")
+	// Explicit interactive flag takes precedence
+	if c.Interactive {
+		return true
+	}
+
+	// If both type and description are provided, it's direct mode
+	if c.TypeName != "" && c.Description != "" {
+		return false
+	}
+
+	// Otherwise, default to interactive
+	return true
 }
 
 // Validate checks if the CLIConfig has valid values.
