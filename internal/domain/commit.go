@@ -17,7 +17,7 @@ type Commit struct {
 }
 
 const (
-	MaxDescriptionLength = 50
+	MaxDescriptionLength = 72
 	MaxBodyLineLength    = 72
 	MaxBodyLength        = 500
 )

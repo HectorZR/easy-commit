@@ -29,13 +29,20 @@ func (c *CLIConfig) IsInteractive() bool {
 		return true
 	}
 
+	// If type or description are empty, default to interactive
+	// unless both are empty (which also triggers interactive)
+	if c.TypeName == "" && c.Description == "" {
+		return true
+	}
+
 	// If both type and description are provided, it's direct mode
 	if c.TypeName != "" && c.Description != "" {
 		return false
 	}
 
-	// Otherwise, default to interactive
-	return true
+	// If only one is provided (partial data), it's also direct mode
+	// The validation will catch the missing field later
+	return false
 }
 
 // Validate checks if the CLIConfig has valid values.
