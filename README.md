@@ -23,7 +23,47 @@ A Go CLI application to create commits following the Conventional Commits specif
 
 ## 📦 Installation
 
-### Option 1: Download Pre-built Binary (Recommended)
+### Quick Install (Recommended)
+
+Install or update easy-commit with a single command:
+
+**Linux/macOS:**
+```bash
+curl -sSL https://raw.githubusercontent.com/HectorZR/easy-commit/main/install.sh | sh
+```
+
+**Windows (Git Bash/WSL):**
+```bash
+curl -sSL https://raw.githubusercontent.com/HectorZR/easy-commit/main/install.sh | sh
+```
+
+The installer will:
+- ✅ Detect your OS and architecture automatically
+- ✅ Download the latest release from GitHub
+- ✅ Verify integrity with SHA256 checksums
+- ✅ Install to `/usr/local/bin` or `~/.local/bin`
+- ✅ Check for updates and upgrade automatically
+
+**Custom installation:**
+```bash
+# Install specific version
+VERSION=v1.0.0 curl -sSL https://raw.githubusercontent.com/HectorZR/easy-commit/main/install.sh | sh
+
+# Custom installation directory
+INSTALL_DIR=/custom/path curl -sSL https://raw.githubusercontent.com/HectorZR/easy-commit/main/install.sh | sh
+
+# Skip checksum verification
+SKIP_VERIFY=1 curl -sSL https://raw.githubusercontent.com/HectorZR/easy-commit/main/install.sh | sh
+
+# Force reinstall
+FORCE=1 curl -sSL https://raw.githubusercontent.com/HectorZR/easy-commit/main/install.sh | sh
+```
+
+---
+
+### Alternative Installation Methods
+
+#### Option 1: Download Pre-built Binary
 
 Download the latest binary for your platform from the [releases page](https://github.com/HectorZR/easy-commit/releases/latest).
 
@@ -49,7 +89,7 @@ easy-commit --version
 # Move easy-commit.exe to a directory in your PATH
 ```
 
-### Option 2: Install with Go
+#### Option 2: Install with Go
 
 If you have Go installed (1.24 or later):
 
@@ -57,7 +97,7 @@ If you have Go installed (1.24 or later):
 go install github.com/hector/easy-commit/cmd/easy-commit@latest
 ```
 
-### Option 3: Build from Source
+#### Option 3: Build from Source
 
 ```bash
 # Clone the repository
