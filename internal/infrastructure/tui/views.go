@@ -89,12 +89,14 @@ func renderFooter(m Model) string {
 	switch m.currentStep {
 	case StepTypeSelect:
 		help = "[↑↓] Navigate  [/] Filter  [Enter] Select  [Ctrl+C] Cancel"
-	case StepDescription, StepScope, StepBody:
+	case StepDescription, StepScope:
 		backHelp := ""
 		if m.currentStep > StepTypeSelect {
 			backHelp = "  [Ctrl+B] Back"
 		}
 		help = "[Enter] Continue" + backHelp + "  [Ctrl+C] Cancel"
+	case StepBody:
+		help = "[Enter] New line  [Ctrl+D] Continue  [Ctrl+B] Back  [Ctrl+C] Cancel"
 	case StepBreaking, StepConfirm:
 		help = "[Y/N] or [←→] Choose  [Enter] Continue  [Ctrl+B] Back  [Ctrl+C] Cancel"
 	case StepPreview:
@@ -167,8 +169,8 @@ func renderScopeInput(m Model) string {
 // renderBodyInput renders the body input step
 func renderBodyInput(m Model) string {
 	instruction := HeaderStyle.Render("Enter detailed description (optional):")
-	info := SubtleStyle.Render("Provide additional context about the changes")
-	skipInfo := MutedStyle.Render("Press Enter to skip")
+	info := SubtleStyle.Render("Provide additional context about the changes. Use ↑↓ to navigate, Enter for new line.")
+	skipInfo := MutedStyle.Render("Press Ctrl+D or Esc then Enter to finish")
 
 	input := m.bodyInput.View()
 

@@ -1,6 +1,7 @@
 package components
 
 import (
+	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -40,19 +41,21 @@ func NewScopeInput() textinput.Model {
 	return ti
 }
 
-// NewBodyInput creates a text input for commit body
-func NewBodyInput() textinput.Model {
-	ti := textinput.New()
-	ti.Placeholder = "Detailed explanation... (optional)"
-	ti.Focus()
-	ti.CharLimit = 0 // No limit for body
-	ti.Width = 60
-	ti.Prompt = "→ "
-	ti.PromptStyle = focusedStyle
-	ti.TextStyle = lipgloss.NewStyle()
-	ti.Cursor.Style = cursorStyle
+// NewBodyInput creates a textarea for commit body (multiline)
+func NewBodyInput() textarea.Model {
+	ta := textarea.New()
+	ta.Placeholder = "Detailed explanation... (optional)"
+	ta.Focus()
+	ta.CharLimit = 0 // No limit for body
+	ta.SetWidth(60)
+	ta.SetHeight(5) // Initial height of 5 lines
+	ta.ShowLineNumbers = false
+	ta.Prompt = "→ "
+	ta.FocusedStyle.CursorLine = lipgloss.NewStyle()
+	ta.FocusedStyle.Prompt = focusedStyle
+	ta.FocusedStyle.Text = lipgloss.NewStyle()
 
-	return ti
+	return ta
 }
 
 // ValidationResult represents the validation state of an input

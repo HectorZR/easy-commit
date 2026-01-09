@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/hector/easy-commit/internal/application"
@@ -38,7 +39,7 @@ type Model struct {
 	typeList        list.Model
 	descInput       textinput.Model
 	scopeInput      textinput.Model
-	bodyInput       textinput.Model
+	bodyInput       textarea.Model
 	breakingConfirm components.ConfirmationState
 	finalConfirm    components.ConfirmationState
 
@@ -123,10 +124,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // handleKeyPress handles keyboard input
 func (m Model) handleKeyPress(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
-	case "ctrl+c", "esc":
+	case "ctrl+c":
 		m.cancelled = true
 		m.quitting = true
 		return m, tea.Quit
+
+	case "esc":
+		// For textarea body input, Esc alone doesn't quit, only Ctrl+C does
+		if m.currentStep != StepBody {
+			m.cancelled = true
+			m.quitting = true
+			return m, tea.Quit
+		}
 
 	case "ctrl+b":
 		// Go back to previous step
@@ -136,7 +145,19 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
+	case "ctrl+d":
+		// Ctrl+D advances from body textarea to next step
+		if m.currentStep == StepBody {
+			m.commit.Body = m.bodyInput.Value()
+			m.currentStep = StepBreaking
+			return m, nil
+		}
+
 	case "enter":
+		// Don't handle Enter in body step (textarea needs it for new lines)
+		if m.currentStep == StepBody {
+			return m.updateActiveComponent(msg)
+		}
 		return m.handleEnter()
 
 	case "left", "right", "h", "l":
