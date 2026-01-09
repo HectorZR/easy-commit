@@ -13,9 +13,8 @@ func RenderView(m Model) string {
 		if m.cancelled {
 			return RenderWarning("Commit cancelled by user\n")
 		}
-		if m.currentStep == StepDone {
-			return renderDone(m)
-		}
+		// TUI is exiting to execute commit
+		return renderExitingForCommit(m)
 	}
 
 	// Render header
@@ -38,8 +37,6 @@ func RenderView(m Model) string {
 		content = renderPreview(m)
 	case StepConfirm:
 		content = renderFinalConfirmation(m)
-	case StepCreating:
-		content = renderCreating(m)
 	default:
 		content = "Unknown step"
 	}
@@ -236,38 +233,16 @@ func renderFinalConfirmation(m Model) string {
 	)
 }
 
-// renderCreating shows a message while creating the commit
-func renderCreating(m Model) string {
-	message := HighlightStyle.Render("⏳ Creating commit...")
+// renderExitingForCommit shows a message before exiting TUI to execute commit
+func renderExitingForCommit(m Model) string {
+	message := HighlightStyle.Render("✓ Commit prepared!")
+	info := SubtleStyle.Render("Executing git commit...")
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		"",
 		message,
-		"",
-	)
-}
-
-// renderDone shows success message
-func renderDone(m Model) string {
-	if m.err != nil {
-		return lipgloss.JoinVertical(
-			lipgloss.Left,
-			"",
-			RenderError(fmt.Sprintf("Failed to create commit: %v", m.err)),
-			"",
-		)
-	}
-
-	success := RenderSuccess("Commit created successfully!")
-	commitMsg := SubtleStyle.Render(m.commit.Format())
-
-	return lipgloss.JoinVertical(
-		lipgloss.Left,
-		"",
-		success,
-		"",
-		commitMsg,
+		info,
 		"",
 	)
 }

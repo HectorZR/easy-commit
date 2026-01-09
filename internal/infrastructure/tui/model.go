@@ -24,8 +24,6 @@ const (
 	StepBreaking
 	StepPreview
 	StepConfirm
-	StepCreating
-	StepDone
 )
 
 // Model is the main Bubble Tea model for the interactive flow
@@ -107,14 +105,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case CommitCreatedMsg:
-		if msg.Success {
-			m.currentStep = StepDone
-			m.quitting = true
-			return m, tea.Quit
-		} else {
-			m.err = msg.Error
-		}
-		return m, nil
+		// TUI finished, commit will be executed after TUI exits
+		m.quitting = true
+		return m, tea.Quit
 	}
 
 	// Delegate to active component
@@ -253,16 +246,11 @@ func (m Model) handleEnter() (tea.Model, tea.Cmd) {
 
 	case StepConfirm:
 		if m.finalConfirm.GetValue() {
-			// User confirmed, create commit
-			m.currentStep = StepCreating
+			// User confirmed, signal TUI to exit (commit will happen after)
 			return m, m.createCommit()
 		}
 		// User declined
 		m.cancelled = true
-		m.quitting = true
-		return m, tea.Quit
-
-	case StepDone:
 		m.quitting = true
 		return m, tea.Quit
 	}
@@ -303,13 +291,11 @@ func (m *Model) focusCurrentStep() {
 	}
 }
 
-// createCommit executes the git commit command
+// createCommit signals that the TUI should exit so the commit can be executed
 func (m Model) createCommit() tea.Cmd {
 	return func() tea.Msg {
-		err := m.service.CreateCommit(m.ctx, m.commit)
-		if err != nil {
-			return CommitCreatedMsg{Success: false, Error: err}
-		}
+		// Don't execute commit here - it will happen after TUI exits
+		// This allows git output to be shown natively in the terminal
 		return CommitCreatedMsg{Success: true}
 	}
 }

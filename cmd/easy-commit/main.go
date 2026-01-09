@@ -79,7 +79,7 @@ func main() {
 		// Create Bubble Tea model
 		model := tui.NewModel(service, commitTypes, ctx)
 
-		// Run Bubble Tea program
+		// Run Bubble Tea program to collect commit information
 		program := tea.NewProgram(model)
 		finalModel, err := program.Run()
 		if err != nil {
@@ -99,7 +99,15 @@ func main() {
 			os.Exit(1)
 		}
 
-		// Success is already shown by the TUI
+		// Execute the commit after TUI exits (with native git output)
+		fmt.Println() // Add spacing after TUI
+		commit := result.GetCommit()
+		if err := service.CreateCommit(ctx, commit); err != nil {
+			fmt.Fprintf(os.Stderr, "Error creating commit: %v\n", err)
+			os.Exit(1)
+		}
+
+		fmt.Println("\n✓ Commit created successfully!")
 	} else {
 		// Direct mode (non-interactive)
 		logger.Info("Running in direct mode")

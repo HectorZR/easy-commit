@@ -2,6 +2,7 @@ package git
 
 import (
 	"context"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -56,18 +57,25 @@ func (e *Executor) HasStagedChanges() bool {
 }
 
 // Commit creates a Git commit with the provided message.
+// Output is shown directly to the user in real-time via stdout/stderr.
 func (e *Executor) Commit(ctx context.Context, message string) error {
 	e.logger.Info("Executing Git commit")
 
 	cmd := exec.CommandContext(ctx, "git", "commit", "-m", message)
-	output, err := cmd.CombinedOutput()
+
+	// Connect git's output directly to the terminal for real-time output
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Run()
 
 	if err != nil {
-		e.logger.Error("Git commit failed: %v, Output: %s", err, string(output))
-		return shared.WrapError(shared.ErrGitCommandFailed, string(output))
+		e.logger.Error("Git commit failed: %v", err)
+		return shared.WrapError(shared.ErrGitCommandFailed, err.Error())
 	}
 
-	e.logger.Info("Git commit successful: %s", strings.TrimSpace(string(output)))
+	e.logger.Info("Git commit successful")
 	return nil
 }
 
