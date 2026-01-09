@@ -9,6 +9,12 @@ import (
 	"github.com/hector/easy-commit/internal/shared"
 )
 
+// contextKey is a custom type for context keys to avoid collisions
+// as recommended by Go best practices (staticcheck SA1029)
+type contextKey string
+
+const testContextKey contextKey = "testKey"
+
 func TestNewExecutor(t *testing.T) {
 	logger := shared.NewLogger(shared.SILENT)
 	timeoutsConfig := &config.TimeoutsConfig{
@@ -267,7 +273,7 @@ func TestExecutor_CommitWithDifferentContexts(t *testing.T) {
 		},
 		{
 			name:    "context with value",
-			ctx:     context.WithValue(context.Background(), "key", "value"),
+			ctx:     context.WithValue(context.Background(), testContextKey, "value"),
 			message: "test: context with value",
 		},
 	}
