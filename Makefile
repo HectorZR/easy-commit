@@ -65,6 +65,24 @@ test-coverage: ## Run tests with coverage report
 	@echo "For HTML coverage report, run:"
 	@echo "  go tool cover -html=coverage.txt"
 
+.PHONY: test-html
+test-html: ## Run tests and generate HTML coverage report
+	@echo "Running tests with coverage..."
+	@go test -coverprofile=coverage.out ./...
+	@echo ""
+	@echo "Generating HTML coverage report..."
+	@go tool cover -html=coverage.out -o coverage.html
+	@echo "✓ Coverage report generated: coverage.html"
+	@echo ""
+	@echo "Opening coverage report in browser..."
+	@if [ "$(shell uname)" = "Darwin" ]; then \
+		open coverage.html; \
+	elif [ "$(shell uname)" = "Linux" ]; then \
+		xdg-open coverage.html 2>/dev/null || echo "Please open coverage.html manually"; \
+	else \
+		echo "Please open coverage.html in your browser"; \
+	fi
+
 .PHONY: lint
 lint: ## Run linter (requires golangci-lint)
 	@echo "Running linter..."
@@ -81,7 +99,7 @@ lint: ## Run linter (requires golangci-lint)
 clean: ## Remove build artifacts
 	@echo "Cleaning build artifacts..."
 	@rm -f $(BINARY_NAME)
-	@rm -f coverage.txt
+	@rm -f coverage.txt coverage.out coverage.html
 	@rm -rf $(BUILD_DIR)
 	@echo "✓ Clean complete"
 
