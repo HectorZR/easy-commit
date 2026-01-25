@@ -1,0 +1,53 @@
+{
+  "name": "easy-commit",
+  "version": "0.0.0",
+  "description": "Create conventional commits with an interactive TUI",
+  "type": "module",
+  "bin": {
+    "easy-commit": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "build:standalone": "bun build src/index.ts --compile --outfile easy-commit",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
+    "lint": "biome check .",
+    "lint:fix": "biome check --apply .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules easy-commit"
+  },
+  "keywords": [
+    "git",
+    "commit",
+    "conventional-commits",
+    "cli",
+    "tui"
+  ],
+  "author": "Hector",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.12",
+    "@types/bun": "latest",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.0.10",
+    "@types/react": "^19.2.9",
+    "ink-testing-library": "^4.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "ink": "^6.6.0",
+    "ink-box": "^2.0.0",
+    "ink-select-input": "^6.2.0",
+    "ink-text-input": "^6.0.0",
+    "js-yaml": "^4.1.1",
+    "react": "^19.2.3",
+    "zod": "^4.3.6"
+  }
+}
