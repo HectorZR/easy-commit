@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "bun run src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
-    "build:standalone": "bun build src/index.ts --compile --outfile easy-commit",
+    "build:standalone": "bun run scripts/build.ts",
+    "build:quick": "bun build src/index.ts --compile --outfile easy-commit",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",
@@ -34,7 +35,8 @@
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.0.10",
     "@types/react": "^19.2.9",
-    "ink-testing-library": "^4.0.0"
+    "ink-testing-library": "^4.0.0",
+    "react-devtools-core": "^7.0.1"
   },
   "peerDependencies": {
     "typescript": "^5"
