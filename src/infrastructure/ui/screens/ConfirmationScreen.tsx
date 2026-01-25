@@ -1,5 +1,5 @@
 import { Box, Text, useInput } from 'ink';
-import type React from 'react';
+import React from 'react';
 import { useState } from 'react';
 import { CustomFooter, Header, ProgressBar } from '../components';
 import { colors, text } from '../styles';

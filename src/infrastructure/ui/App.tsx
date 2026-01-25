@@ -1,5 +1,5 @@
 import { render } from 'ink';
-import type React from 'react';
+import React from 'react';
 import type { CommitService } from '../../application/services/commit-service';
 import type { Commit } from '../../domain/entities/commit';
 import type { Config } from '../config/config-loader';
