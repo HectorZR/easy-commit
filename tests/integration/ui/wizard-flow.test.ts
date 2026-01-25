@@ -182,7 +182,13 @@ describe('TUI Integration Tests', () => {
     });
 
     test('should generate correct commit message with body but no scope', () => {
-      const commit = new Commit('docs', 'update readme', undefined, 'Added installation instructions', false);
+      const commit = new Commit(
+        'docs',
+        'update readme',
+        undefined,
+        'Added installation instructions',
+        false
+      );
 
       const message = commit.format();
 

@@ -1,8 +1,8 @@
-import { describe, expect, test, mock } from 'bun:test';
+import { describe, expect, mock, test } from 'bun:test';
 import { render } from 'ink-testing-library';
 import React from 'react';
-import { TypeSelectionScreen } from '../../../../src/infrastructure/ui/screens/TypeSelectionScreen';
 import { DescriptionInputScreen } from '../../../../src/infrastructure/ui/screens/DescriptionInputScreen';
+import { TypeSelectionScreen } from '../../../../src/infrastructure/ui/screens/TypeSelectionScreen';
 import { Screen, type WizardState } from '../../../../src/infrastructure/ui/types';
 
 describe('TypeSelectionScreen', () => {

@@ -1,6 +1,6 @@
 import { Box, Text, useInput } from 'ink';
 import TextInput from 'ink-text-input';
-import React from 'react';
+import type React from 'react';
 import { useState } from 'react';
 import { CustomFooter, Header, ProgressBar, ValidationMessage } from '../components';
 import { text } from '../styles';

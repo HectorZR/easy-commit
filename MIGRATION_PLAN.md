@@ -1659,15 +1659,15 @@ jobs:
 - [ ] Set up development environment
 
 ### During Migration
-- [ ] Phase 1: Setup ✅
-- [ ] Phase 2: Domain ✅
-- [ ] Phase 3: Infrastructure Base ✅
-- [ ] Phase 4: Application ✅
-- [ ] Phase 5: TUI ✅
-- [ ] Phase 6: Entry Point ✅
-- [ ] Phase 7: Build & Distribution ✅
-- [ ] Phase 8: Testing ✅
-- [ ] Phase 9: Documentation ✅
+- [x] Phase 1: Setup ✅
+- [x] Phase 2: Domain ✅
+- [x] Phase 3: Infrastructure Base ✅
+- [x] Phase 4: Application ✅
+- [x] Phase 5: TUI ✅
+- [x] Phase 6: Entry Point ✅
+- [ ] Phase 7: Build & Distribution
+- [ ] Phase 8: Testing
+- [ ] Phase 9: Documentation
 
 ### Post-Migration
 - [ ] Feature parity verified

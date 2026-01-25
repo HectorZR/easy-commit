@@ -1,5 +1,5 @@
 import { Box, Text, useInput } from 'ink';
-import React from 'react';
+import type React from 'react';
 import { Commit } from '../../../domain/entities/commit';
 import { CustomFooter, Header, ProgressBar } from '../components';
 import { colors, text } from '../styles';

@@ -68,7 +68,7 @@ Commit Types:
    * Parses command line arguments and returns configuration
    */
   parse(args: string[]): CliConfig {
-    this.program.parse(args, { from: 'user' });
+    this.program.parse(args, { from: 'node' });
     const opts = this.program.opts();
 
     return {

@@ -1,10 +1,13 @@
 import { describe, expect, test } from 'bun:test';
 import { render } from 'ink-testing-library';
 import React from 'react';
+import {
+  ErrorMessage,
+  ValidationMessage,
+} from '../../../../src/infrastructure/ui/components/ErrorMessage';
+import { CustomFooter, Footer } from '../../../../src/infrastructure/ui/components/Footer';
 import { Header } from '../../../../src/infrastructure/ui/components/Header';
-import { Footer, CustomFooter } from '../../../../src/infrastructure/ui/components/Footer';
 import { ProgressBar } from '../../../../src/infrastructure/ui/components/ProgressBar';
-import { ErrorMessage, ValidationMessage } from '../../../../src/infrastructure/ui/components/ErrorMessage';
 
 describe('UI Components', () => {
   describe('Header', () => {
