@@ -2,80 +2,74 @@
 
 ## Project Overview
 
-Easy Commit CLI is a Go application for creating commits that follow the Conventional Commits specification. The project features:
-- Interactive Terminal User Interface (TUI) built with Bubble Tea framework
+Easy Commit CLI is a TypeScript application for creating commits that follow the Conventional Commits specification. The project features:
+- Interactive Terminal User Interface (TUI) built with ink (React for terminal)
 - Clean Architecture with three-layer separation (Domain, Application, Infrastructure)
-- Concurrent validation using worker pools
+- Async validation with Promise-based concurrency
 - Support for both interactive and direct CLI modes
+- Ultra-fast runtime powered by Bun
+
+**Migration Status:** This project is being migrated from Go to TypeScript + Bun. See [MIGRATION_PLAN.md](./MIGRATION_PLAN.md) for details.
 
 ## Setup Commands
 
 ```bash
+# Install Bun (if not already installed)
+curl -fsSL https://bun.sh/install | bash
+
 # Install dependencies
-go mod download
+bun install
 
 # Build the project
-go build -o easy-commit ./cmd/easy-commit
+bun run build
+
+# Build standalone binary
+bun run build:standalone
 
 # Run in development
-go run ./cmd/easy-commit
+bun run dev
 
-# Install globally
-go install ./cmd/easy-commit
+# Install globally (after build)
+bun link
 
 # Run tests
-go test ./...
+bun test
 
 # Run tests with coverage
-go test -cover ./...
+bun test --coverage
 
-# Run specific package tests
-go test ./internal/domain -v
-go test ./internal/application -v
-go test ./test/integration -v
-```
+# Run tests in watch mode
+bun test --watch
 
-## Project Structure
+# Lint and format
+bun run lint
+bun run format
 
-The project follows Clean Architecture principles with strict layer separation:
-
-```
-easy-commit/
-├── cmd/easy-commit/          # Entry point (main.go)
-├── internal/
-│   ├── domain/              # Domain layer: entities, value objects, interfaces
-│   ├── application/         # Application layer: use cases, services
-│   ├── infrastructure/      # Infrastructure layer: external implementations
-│   │   ├── cli/            # CLI argument parsing
-│   │   ├── git/            # Git command execution
-│   │   ├── terminal/       # Terminal I/O (legacy)
-│   │   └── tui/            # Bubble Tea TUI components
-│   ├── config/             # Configuration management
-│   └── shared/             # Shared utilities (errors, logger)
-└── test/                    # Tests (integration and unit)
+# Type checking
+bun run typecheck
 ```
 
 ## Architecture Guidelines
 
 ### Layer Responsibilities
 
-**Domain Layer** (`internal/domain/`):
+**Domain Layer** (`src/domain/`):
 - Contains core business entities and value objects
 - Defines repository interfaces
-- No external dependencies
-- Pure Go types and logic
+- No external dependencies (pure TypeScript)
+- Business logic and validation rules
 
-**Application Layer** (`internal/application/`):
-- Implements use cases and business logic
+**Application Layer** (`src/application/`):
+- Implements use cases and business workflows
 - Orchestrates domain objects
 - Depends only on domain layer
-- Contains validators and services
+- Contains services and validators
 
-**Infrastructure Layer** (`internal/infrastructure/`):
+**Infrastructure Layer** (`src/infrastructure/`):
 - Implements domain interfaces
-- Handles external concerns (git, terminal, TUI)
+- Handles external concerns (git, terminal, TUI, config)
 - Depends on application and domain layers
-- Contains framework-specific code
+- Contains framework-specific code (ink, commander, etc.)
 
 ### Dependency Flow
 
@@ -88,33 +82,38 @@ Never import from a higher layer into a lower layer.
 
 ## Code Style and Conventions
 
-### General Go Conventions
-- Follow standard Go formatting (`gofmt` compliant)
-- Use meaningful variable names (no single-letter variables except for short scopes)
-- Use `camelCase` for private members, `PascalCase` for public
-- Group imports: standard library, external packages, internal packages
-- Add comments for exported functions, types, and packages
+### TypeScript Conventions
+- Follow TypeScript best practices and ESLint rules
+- The created files must be named with kebab-case
+- Use Biome for consistent formatting
+- Use `camelCase` for variables and functions, `PascalCase` for classes and types
+- Prefer `const` over `let`, avoid `var`
+- Use type annotations for function parameters and return types
+- Prefer `interface` for object shapes, `type` for unions/intersections
+- Add JSDoc comments for exported functions and classes
 
 ### Error Handling
-- Use custom error types from `shared/errors.go`
-- Wrap errors with context using `fmt.Errorf` with `%w`
-- Return errors, don't panic (except in truly unrecoverable situations)
-- Log errors at appropriate levels using the shared logger
+- Use custom error classes from `domain/errors.ts` and `shared/errors.ts`
+- Throw errors for exceptional cases
+- Use try-catch blocks for async operations
+- Log errors appropriately using the shared logger
+- Provide meaningful error messages with context
 
-### Bubble Tea TUI Development
+### ink TUI Development
 
-When working with the TUI (`internal/infrastructure/tui/`):
+When working with the TUI (`src/infrastructure/ui/`):
 
-**The Elm Architecture (TEA)**:
-- `Model`: Contains all state, must be immutable
-- `Update`: Pure function that handles messages and returns new model
-- `View`: Pure function that renders the UI from model state
+**React Component Pattern**:
+- Functional components with hooks
+- `useState` for local state
+- `useInput` for keyboard handling
+- `useEffect` for side effects
 
 **Key principles**:
-- Never mutate the model directly
-- All state changes happen in `Update` function
-- Use commands (`tea.Cmd`) for side effects
-- Components are in `tui/components/` directory
+- Keep components small and focused
+- Use custom hooks for complex state logic
+- Handle navigation with state machines
+- Separate presentation from logic
 
 **Navigation flow**:
 1. Type Selection → 2. Description Input → 3. Scope Input → 4. Body Input → 5. Breaking Change → 6. Preview → 7. Confirmation
@@ -124,24 +123,38 @@ When working with the TUI (`internal/infrastructure/tui/`):
 Configuration is loaded from `.easy-commit.yaml` (optional):
 - Falls back to defaults if file not found
 - See `.easy-commit.example.yaml` for structure
-- Config struct is in `internal/config/`
-- Use `config.LoadOrDefault()` to load
+- Config validation with Zod schema
+- Use `ConfigLoader.loadOrDefault()` to load
 
 ## Testing Guidelines
 
 ### Test Organization
-- Unit tests: Place next to the file being tested (`foo.go` → `foo_test.go`)
-- Integration tests: Place in `test/integration/`
-- Use table-driven tests for multiple scenarios
-- Mock external dependencies (git commands, I/O)
+- Unit tests: Place in `tests/unit/` organized by layer
+- Integration tests: Place in `tests/integration/`
+- E2E tests: Place in `tests/e2e/`
+- Use descriptive test names
+- Test both success and error paths
 
-### Test Naming
-- Test functions: `TestFunctionName_Scenario`
-- Subtests: `t.Run("description of scenario", func(t *testing.T) {...})`
+### Test Framework
+Use Bun's built-in test runner (Jest-compatible API):
+```typescript
+import { describe, test, expect, beforeEach, mock } from 'bun:test';
+
+describe('Component', () => {
+  test('should do something', () => {
+    expect(result).toBe(expected);
+  });
+});
+```
+
+### Mocking
+- Use `mock()` from `bun:test` for function mocks
+- Create mock implementations for interfaces
+- Use `ink-testing-library` for UI component testing
 
 ### Coverage Expectations
 - Aim for >80% coverage on domain and application layers
-- TUI components may have lower coverage due to I/O complexity
+- UI components may have lower coverage due to interactivity
 - Always test error paths, not just happy paths
 
 ## Git Workflow
@@ -158,7 +171,9 @@ This project uses its own tool! Commits should follow Conventional Commits:
 
 Use the CLI itself to create commits:
 ```bash
-./easy-commit
+bun run dev
+# or
+./easy-commit  # if built
 ```
 
 ### Commit Types
@@ -182,58 +197,80 @@ Mark breaking changes using:
 ## Common Tasks
 
 ### Adding a New Commit Type
-1. Update `internal/domain/types.go` with new type
-2. Add description to the `CommitTypes` map
+1. Update `src/domain/entities/commit-type.ts` with new type
+2. Add to `COMMIT_TYPES` array with description
 3. Update README.md documentation
-4. Add tests in `internal/domain/types_test.go`
+4. Add tests in `tests/unit/domain/commit-type.test.ts`
 
-### Adding a New TUI Component
-1. Create file in `internal/infrastructure/tui/components/`
-2. Implement Bubble Tea model interface (`Init`, `Update`, `View`)
-3. Add styling in `tui/styles.go`
-4. Integrate into main model in `tui/model.go`
-5. Add integration test in `test/integration/tui_integration_test.go`
+### Adding a New TUI Screen
+1. Create component in `src/infrastructure/ui/screens/`
+2. Implement React component with ink components
+3. Add keyboard handling with `useInput` hook
+4. Add styling in `ui/styles.ts`
+5. Integrate into App.tsx state machine
+6. Add integration test in `tests/integration/ui/`
 
 ### Modifying Validation Rules
-1. Update validators in `internal/application/validator.go`
-2. Update config defaults in `internal/config/defaults.go`
+1. Update validators in `src/application/validators/concurrent-validator.ts`
+2. Update config schema in `src/infrastructure/config/config-loader.ts`
 3. Update example config in `.easy-commit.example.yaml`
 4. Add corresponding tests
 
 ### Adding New CLI Flags
-1. Update parser in `internal/infrastructure/cli/parser.go`
+1. Update parser in `src/infrastructure/cli/cli-parser.ts`
 2. Update help text in parser
 3. Update README.md usage section
 4. Test both interactive and direct modes
 
 ## Dependencies
 
-Key external libraries:
-- **Bubble Tea**: TUI framework (github.com/charmbracelet/bubbletea)
-- **Bubbles**: TUI components (github.com/charmbracelet/bubbles)
-- **Lipgloss**: Terminal styling (github.com/charmbracelet/lipgloss)
-- **YAML v3**: Config parsing (gopkg.in/yaml.v3)
+### Core Runtime
+- **Bun**: Ultra-fast JavaScript runtime and bundler
+- **TypeScript**: Type-safe JavaScript
+
+### TUI Framework
+- **ink**: React for terminal (github.com/vadimdemedes/ink)
+- **React**: UI library (used by ink)
+- **ink-text-input**: Text input component
+- **ink-select-input**: Select/list component
+- **ink-box**: Box component for layouts
+- **chalk**: Terminal colors
+
+### Infrastructure
+- **commander**: CLI argument parsing
+- **js-yaml**: YAML configuration parsing
+- **zod**: Schema validation for config
+
+### Development
+- **@biomejs/biome**: Fast linter and formatter (replaces ESLint + Prettier)
+- **ink-testing-library**: Testing utilities for ink components
 
 Keep dependencies minimal and avoid adding new ones unless necessary.
 
 ## Performance Considerations
 
-### Concurrent Validation
-- Uses worker pool pattern for validation (`application/validator.go`)
-- Default: 4 workers (configurable in `.easy-commit.yaml`)
-- Validates multiple rules in parallel using goroutines and channels
+### Async Validation
+- Uses `Promise.all()` for concurrent validation
+- Default: 4 concurrent validators (configurable in `.easy-commit.yaml`)
+- Validates multiple rules in parallel using async/await
 
 ### Git Command Execution
-- Git commands have configurable timeouts
-- Default timeout: 5s (see `config/defaults.go`)
-- Commands are executed synchronously but with timeout context
+- Git commands executed via `Bun.spawn()`
+- Configurable timeouts (default: 5s)
+- Real-time output streaming with `stdout: 'inherit'`
+
+### Bun Advantages
+- Ultra-fast startup time (~3x faster than Node.js)
+- Built-in TypeScript support (no transpilation needed)
+- Native bundler and test runner
+- Efficient process spawning
 
 ## Security Notes
 
 - No sensitive data is stored or logged
 - Git credentials are handled by git itself (not this tool)
 - All user input is validated before git execution
-- No shell injection vulnerabilities (uses exec.CommandContext properly)
+- No command injection vulnerabilities (uses spawn with array arguments)
 
 ## Known Limitations
 
@@ -242,6 +279,7 @@ Keep dependencies minimal and avoid adding new ones unless necessary.
 3. Arrow key navigation may not work in all terminal emulators
 4. No support for GPG signing (must be configured in git config)
 5. Does not support multi-line descriptions (by design, per Conventional Commits)
+6. Requires Bun runtime (unless using standalone binary)
 
 ## Debugging
 
@@ -253,17 +291,23 @@ logger:
 ```
 
 Or check the code directly:
-- Logger calls are in `shared/logger.go`
-- Service logic in `application/commit_service.go`
-- Git execution in `infrastructure/git/executor.go`
+- Logger calls are in `infrastructure/logger/logger.ts`
+- Service logic in `application/services/commit-service.ts`
+- Git execution in `infrastructure/git/git-executor.ts`
+
+Debug TUI components:
+```typescript
+// Use console.error in components (stdout is used by ink)
+console.error('Debug:', { state });
+```
 
 ## Resources
 
 - [Conventional Commits Spec](https://www.conventionalcommits.org/)
-- [Bubble Tea Documentation](https://github.com/charmbracelet/bubbletea)
+- [ink Documentation](https://github.com/vadimdemedes/ink)
+- [Bun Documentation](https://bun.sh/docs)
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-- [Go Concurrency Patterns](https://go.dev/blog/pipelines)
-- [GoReleaser Documentation](https://goreleaser.com/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [Semantic Versioning](https://semver.org/)
 
 ## Release Process
@@ -275,47 +319,42 @@ This project follows **Semantic Versioning 2.0.0** (MAJOR.MINOR.PATCH):
 - **MINOR** (v1.1.0): New features, backwards compatible
 - **PATCH** (v1.0.1): Bug fixes, backwards compatible
 
-Version is injected at build-time using ldflags. **Never hardcode version in code.**
+Version is injected at build-time via environment variables.
 
 ### Build-Time Version Injection
 
-The version information is stored in variables that are overridden during build:
+The version information is stored in variables set during build:
 
-```go
-// cmd/easy-commit/main.go
-var (
-    version = "dev"      // Default for development builds
-    commit  = "none"     // Git commit hash
-    date    = "unknown"  // Build date
-    builtBy = "unknown"  // Builder (goreleaser/local/manual)
-)
+```typescript
+// src/version.ts
+export const VERSION = process.env.VERSION || 'dev';
+export const COMMIT = process.env.COMMIT || 'none';
+export const BUILD_DATE = process.env.BUILD_DATE || 'unknown';
+export const BUILT_BY = process.env.BUILT_BY || 'unknown';
 ```
 
 **Local builds:**
 ```bash
 # Development build (version=dev)
-make build
+bun run build
 
-# Simulated release build
-make build-release VERSION=v1.0.0
+# Build with version info
+VERSION=v1.0.0 bun run build:standalone
 
-# Manual with all flags
-go build -ldflags "\
-  -X main.version=v1.0.0 \
-  -X main.commit=$(git rev-parse --short HEAD) \
-  -X main.date=$(date -u '+%Y-%m-%d_%H:%M:%S') \
-  -X main.builtBy=manual" \
-  ./cmd/easy-commit
+# Build script handles version injection
+bun run scripts/build.ts
 ```
 
-**Production builds (GoReleaser):**
-GoReleaser automatically injects the correct values for all variables.
+**Production builds:**
+GitHub Actions automatically injects the correct values for all variables.
 
 ### Release Workflow
 
 **1. Development Phase**
 ```bash
 # Commit using Conventional Commits
+bun run dev  # Use the tool itself
+# or
 git commit -m "feat: add new validation rule"
 git commit -m "fix: resolve scope parsing issue"
 git commit -m "docs: update installation instructions"
@@ -328,10 +367,10 @@ git checkout main
 git pull origin main
 
 # Verify tests pass
-make test
+bun test
 
-# (Optional) Test local build
-make build
+# Verify build works
+bun run build:standalone
 ./easy-commit --version
 ```
 
@@ -352,13 +391,13 @@ git push origin v1.0.1
 **4. Automated CI/CD Process**
 
 GitHub Actions automatically:
-1. ✅ Runs all tests (unit, integration, race detector)
-2. ✅ Builds binaries for 5 platforms:
-   - Linux (amd64, arm64)
-   - macOS (amd64, arm64)
-   - Windows (amd64)
+1. ✅ Runs all tests (unit, integration, coverage)
+2. ✅ Builds standalone binaries for 3 platforms:
+   - Linux (x64, arm64)
+   - macOS (x64, arm64)
+   - Windows (x64)
 3. ✅ Generates CHANGELOG from commits
-4. ✅ Creates compressed archives (.tar.gz, .zip)
+4. ✅ Creates compressed archives (.tar.gz)
 5. ✅ Generates SHA256 checksums
 6. ✅ Creates GitHub Release
 7. ✅ Uploads all artifacts
@@ -368,64 +407,33 @@ GitHub Actions automatically:
 # Check release on GitHub
 open https://github.com/HectorZR/easy-commit/releases
 
-# Test installation via go install
-go install github.com/hector/easy-commit/cmd/easy-commit@v1.0.1
+# Test npm installation
+npm install -g easy-commit
 
 # Verify version
 easy-commit --version
-# Output: easy-commit v1.0.1 (abc123f) built on 2026-01-06_10:30:00 by goreleaser
-
-# Download and verify binary
-curl -LO https://github.com/HectorZR/easy-commit/releases/download/v1.0.1/easy-commit_v1.0.1_checksums.txt
-curl -LO https://github.com/HectorZR/easy-commit/releases/download/v1.0.1/easy-commit_v1.0.1_linux_amd64.tar.gz
-sha256sum -c easy-commit_v1.0.1_checksums.txt
+# Output: easy-commit v1.0.1 (abc123f) built on 2026-01-25_10:30:00 by github-actions
 ```
 
-### GoReleaser Configuration
+### Package Scripts
 
-**Configuration file:** `.goreleaser.yaml`
-
-**Key features:**
-- Multi-platform builds with optimized binaries (`-s -w` ldflags)
-- Automatic CHANGELOG generation from Conventional Commits
-- Commit grouping by type (Features, Bug Fixes, etc.)
-- Excludes `chore:`, `test:`, `style:` from CHANGELOG
-- Checksums for integrity verification
-- Custom release notes with installation instructions
-
-**Local testing:**
-```bash
-# Install goreleaser
-brew install goreleaser/tap/goreleaser
-
-# Validate configuration
-make goreleaser-check
-
-# Test build without publishing (snapshot)
-make goreleaser-snapshot
-
-# Check artifacts
-ls -la dist/
-```
-
-### Makefile Commands
-
-Development commands available:
-
-```bash
-make help                # Show all available commands
-make build               # Build development binary (version=dev)
-make build-release       # Build release binary with version
-make install             # Install binary globally
-make run                 # Build and run
-make test                # Run all tests
-make test-race           # Run tests with race detector
-make test-coverage       # Run tests with coverage report
-make lint                # Run linter (requires golangci-lint)
-make clean               # Remove build artifacts
-make deps                # Download and tidy dependencies
-make goreleaser-check    # Validate GoReleaser config
-make goreleaser-snapshot # Test release build locally
+**package.json scripts:**
+```json
+{
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "build:standalone": "bun build src/index.ts --compile --outfile easy-commit",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
+    "lint": "biome check .",
+    "lint:fix": "biome check --apply .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules easy-commit"
+  }
+}
 ```
 
 ### Version Determination Guidelines
@@ -475,24 +483,56 @@ git tag v1.1.0-beta.1
 git tag v1.1.0-rc.1
 ```
 
-GoReleaser automatically marks these as pre-releases on GitHub.
+GitHub Actions automatically marks these as pre-releases.
 
 ### Continuous Integration
 
 **CI Workflow** (`.github/workflows/ci.yml`):
 - Triggers on: Push to `main`, Pull Requests
-- Runs on: Multiple Go versions (1.24, 1.25)
 - Jobs:
-  - Tests (with race detector and coverage)
+  - Install dependencies with Bun
+  - Run linter (Biome)
+  - Type checking (TypeScript)
+  - Tests (with coverage)
   - Build smoke test
-  - Linting (golangci-lint)
 
 **Release Workflow** (`.github/workflows/release.yml`):
 - Triggers on: Git tags matching `v*`
 - Jobs:
   - Run full test suite
-  - Execute GoReleaser
+  - Build standalone binaries for all platforms
+  - Create GitHub Release
   - Upload artifacts (retained for 7 days)
+
+### Distribution Options
+
+**1. Standalone Binary** (Recommended)
+```bash
+# Build
+bun run build:standalone
+
+# Produces: easy-commit (30-40 MB, no dependencies)
+# Users can download and run immediately
+```
+
+**2. NPM Package**
+```bash
+# Install globally
+npm install -g easy-commit
+
+# Or with Bun
+bun install -g easy-commit
+
+# Requires: Bun runtime installed (~90 MB)
+```
+
+**3. From Source**
+```bash
+git clone https://github.com/HectorZR/easy-commit.git
+cd easy-commit
+bun install
+bun run build:standalone
+```
 
 ### Troubleshooting Releases
 
@@ -512,18 +552,17 @@ open https://github.com/HectorZR/easy-commit/actions
 
 # Common causes:
 # - Tests failing
-# - GoReleaser config error
-# - Missing GITHUB_TOKEN (should be automatic)
+# - Build errors
+# - Missing environment variables
 ```
 
-**Issue: Version not injected correctly**
+**Issue: Version not showing correctly**
 ```bash
-# Verify ldflags in .goreleaser.yaml
-grep -A 5 "ldflags:" .goreleaser.yaml
+# Check environment variables during build
+echo $VERSION $COMMIT $BUILD_DATE
 
-# Test locally
-make build
-./easy-commit --version
+# Verify version.ts is being read
+bun run src/index.ts --version
 ```
 
 ### Release Checklist
@@ -531,11 +570,36 @@ make build
 Before creating a release tag:
 
 - [ ] All changes merged to `main`
-- [ ] Tests pass locally (`make test`)
+- [ ] Tests pass locally (`bun test`)
+- [ ] Build works (`bun run build:standalone`)
 - [ ] CHANGELOG.md updated (or will be auto-generated)
 - [ ] Version number decided (MAJOR.MINOR.PATCH)
 - [ ] Tag message prepared
-- [ ] Post-release announcement planned (optional)
+- [ ] Breaking changes documented (if any)
+
+## Migration from Go
+
+This project was migrated from Go to TypeScript + Bun. Key differences:
+
+### Language Changes
+- Go structs → TypeScript classes/interfaces
+- Goroutines/channels → Promises/async-await
+- `exec.Command` → `Bun.spawn()`
+- Go modules → npm/Bun packages
+
+### Architecture Preserved
+- Clean Architecture layers maintained
+- Domain logic identical
+- Repository pattern unchanged
+- Same commit types and validation rules
+
+### Performance Trade-offs
+- Binary size: 5.6 MB (Go) → 30-40 MB (Bun standalone)
+- Startup: ~5ms (Go) → ~20ms (Bun)
+- Memory: ~8 MB (Go) → ~50 MB (Bun)
+- **Development speed significantly improved**
+
+See [MIGRATION_PLAN.md](./MIGRATION_PLAN.md) for complete migration guide.
 
 ## Questions?
 
@@ -543,7 +607,13 @@ When implementing new features:
 1. Determine which layer the change belongs to (Domain/Application/Infrastructure)
 2. Start from the domain layer and work outward
 3. Keep business logic in application layer, not infrastructure
-4. Update tests before or alongside implementation
-5. Run full test suite before committing
+4. Write tests before or alongside implementation
+5. Run full test suite before committing (`bun test`)
 6. Use Conventional Commits for all changes
 7. Create releases using semantic version tags
+
+When debugging:
+- Use `console.error()` in TUI components (stdout is used by ink)
+- Enable DEBUG log level in config
+- Check test coverage with `bun test --coverage`
+- Use TypeScript's type checking (`bun run typecheck`)
