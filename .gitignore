@@ -21,6 +21,7 @@ go.work
 # IDE and editor files
 .vscode/
 .idea/
+.zed/
 *.swp
 *.swo
 *~
@@ -81,4 +82,3 @@ node_modules/
 bun.lockb
 coverage/
 .turbo/
-
