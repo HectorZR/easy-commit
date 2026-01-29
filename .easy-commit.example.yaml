@@ -5,10 +5,10 @@
 commit:
   # Maximum length for commit description (default: 72)
   maxDescriptionLength: 72
-  
+
   # Maximum length for commit body (default: 500)
   maxBodyLength: 500
-  
+
   # Characters not allowed in commit description (default: empty array)
   invalidChars: []
   # Example: ['@', '#', '$']
@@ -17,13 +17,13 @@ commit:
 timeouts:
   # Timeout for validation operations (default: 5000ms = 5s)
   validation: 5000
-  
+
   # Timeout for git commands (default: 5000ms = 5s)
   gitCommand: 5000
-  
+
   # Timeout for user input in TUI (default: 300000ms = 5min)
   userInput: 300000
-  
+
   # Timeout for context operations (default: 60000ms = 1min)
   context: 60000
 
@@ -36,6 +36,6 @@ validator:
 # Logger configuration
 logger:
   # Log level: DEBUG, INFO, WARN, ERROR, SILENT (default: INFO)
-  level: INFO
+  level: SILENT
   # Use DEBUG for troubleshooting
   # Use SILENT to disable logging
