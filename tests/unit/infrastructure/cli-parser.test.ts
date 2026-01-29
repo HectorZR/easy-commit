@@ -46,7 +46,17 @@ describe('CliParser', () => {
     });
 
     test('should parse multiple options', () => {
-      const config = parser.parse(['node', 'easy-commit', '-t', 'feat', '-m', 'add login', '-s', 'auth', '-b']);
+      const config = parser.parse([
+        'node',
+        'easy-commit',
+        '-t',
+        'feat',
+        '-m',
+        'add login',
+        '-s',
+        'auth',
+        '-b',
+      ]);
 
       expect(config.type).toBe('feat');
       expect(config.message).toBe('add login');

@@ -16,7 +16,10 @@ async function main() {
     console.warn('Warning: Could not get git commit hash');
   }
 
-  const buildDate = new Date().toISOString().replace(/[:.]/g, '_').split('T')[0] + '_' + new Date().toISOString().replace(/[:.]/g, '_').split('T')[1].split('_')[0];
+  const buildDate =
+    new Date().toISOString().replace(/[:.]/g, '_').split('T')[0] +
+    '_' +
+    new Date().toISOString().replace(/[:.]/g, '_').split('T')[1].split('_')[0];
   const builtBy = process.env.BUILT_BY || 'local';
 
   // 2. Set environment variables for build

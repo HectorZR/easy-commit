@@ -243,15 +243,7 @@ describe('E2E: Complete Workflow', () => {
     await Bun.write(join(testDir, 'test2.txt'), 'test content 2');
 
     const proc = spawn(
-      [
-        binaryPath,
-        'run',
-        join(projectRoot, 'src/index.ts'),
-        '-t',
-        'feat',
-        '-m',
-        'test',
-      ],
+      [binaryPath, 'run', join(projectRoot, 'src/index.ts'), '-t', 'feat', '-m', 'test'],
       {
         cwd: testDir,
         stdout: 'pipe',
@@ -268,15 +260,7 @@ describe('E2E: Complete Workflow', () => {
 
   test('should validate commit type', async () => {
     const proc = spawn(
-      [
-        binaryPath,
-        'run',
-        join(projectRoot, 'src/index.ts'),
-        '-t',
-        'invalid',
-        '-m',
-        'test',
-      ],
+      [binaryPath, 'run', join(projectRoot, 'src/index.ts'), '-t', 'invalid', '-m', 'test'],
       {
         cwd: testDir,
         stdout: 'pipe',

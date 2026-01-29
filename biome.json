@@ -18,13 +18,17 @@
       }
     }
   },
+  "assist": {
+    "enabled": true
+  },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
-      "trailingCommas": "es5"
+      "trailingCommas": "es5",
+      "arrowParentheses": "always"
     }
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/dist", "!**/*.log", "!**/bun.lockb"]
+    "includes": ["**", "!**/node_modules", "!!**/dist", "!!**/*.log", "!**/bun.lockb"]
   }
 }
