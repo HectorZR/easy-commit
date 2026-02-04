@@ -4,7 +4,7 @@ import chalk from 'chalk';
  * Color palette for the TUI
  */
 export const colors = {
-  primary: chalk.cyan,
+  primary: chalk.bold.magentaBright,
   success: chalk.green,
   error: chalk.red,
   warning: chalk.yellow,
@@ -18,16 +18,16 @@ export const colors = {
  * Styled text utilities
  */
 export const text = {
-  title: (str: string) => chalk.bold.cyan(str),
+  title: (str: string) => chalk.bold.magentaBright(str),
   subtitle: (str: string) => chalk.gray(str),
   success: (str: string) => chalk.green(`✓ ${str}`),
   error: (str: string) => chalk.red(`✗ ${str}`),
   warning: (str: string) => chalk.yellow(`⚠ ${str}`),
   info: (str: string) => chalk.blue(`ℹ ${str}`),
   label: (str: string) => chalk.bold(str),
-  value: (str: string) => chalk.cyan(str),
+  value: (str: string) => chalk.magentaBright(str),
   hint: (str: string) => chalk.dim(str),
-  selected: (str: string) => chalk.bold.cyan(`❯ ${str}`),
+  selected: (str: string) => chalk.bold.magentaBright(`❯ ${str}`),
   unselected: (str: string) => `  ${str}`,
 };
 

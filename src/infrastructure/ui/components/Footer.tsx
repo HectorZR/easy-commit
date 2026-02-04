@@ -7,8 +7,9 @@ import { text } from '../styles';
  */
 export const Footer: React.FC = () => {
   return (
-    <Box flexDirection="column" marginTop={1} paddingTop={1} borderStyle="single" borderTop>
-      <Text>{text.hint('Use ↑/↓ arrows to navigate, Enter to select, Ctrl+C to cancel')}</Text>
+    <Box flexDirection="column" gap={1} marginTop={1} paddingTop={1}>
+      <Text>{text.hint('  ↑/k up • ↓/j down • / filter • q quit')}</Text>
+      <Text>{text.hint('[↑↓] Navigate  [Enter] Select  [Ctrl+C] Cancel')}</Text>
     </Box>
   );
 };

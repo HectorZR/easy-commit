@@ -53,9 +53,9 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
 
   return (
     <Box flexDirection="column">
-      <Header title="📝 Easy Commit - Scope" subtitle="Optionally specify a scope (optional)" />
-
-      <ProgressBar current={3} total={7} />
+      <Header title="📝 Easy Commit - Scope" subtitle="Optionally specify a scope (optional)">
+        <ProgressBar current={3} total={7} />
+      </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
         <Text>{text.label('Scope (optional):')}</Text>

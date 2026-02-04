@@ -44,9 +44,9 @@ export const PreviewScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, on
       <Header
         title="📝 Easy Commit - Preview"
         subtitle="Review your commit message before creating"
-      />
-
-      <ProgressBar current={6} total={7} />
+      >
+        <ProgressBar current={6} total={7} />
+      </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
         <Text>{text.label('Commit Message Preview:')}</Text>

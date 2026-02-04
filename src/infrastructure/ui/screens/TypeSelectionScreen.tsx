@@ -14,16 +14,16 @@ export const TypeSelectionScreen: React.FC<ScreenProps> = ({ onNext, onCancel })
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useInput((input, key) => {
-    if (key.upArrow) {
+    if (key.upArrow || input === 'k') {
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : COMMIT_TYPES.length - 1));
-    } else if (key.downArrow) {
+    } else if (key.downArrow || input === 'j') {
       setSelectedIndex((prev) => (prev < COMMIT_TYPES.length - 1 ? prev + 1 : 0));
     } else if (key.return) {
       const selectedType = COMMIT_TYPES[selectedIndex];
       if (selectedType) {
         onNext({ type: selectedType.name });
       }
-    } else if (key.escape || (key.ctrl && input === 'c')) {
+    } else if (key.escape || (key.ctrl && input === 'c') || input === 'q') {
       onCancel();
     }
   });
@@ -33,9 +33,9 @@ export const TypeSelectionScreen: React.FC<ScreenProps> = ({ onNext, onCancel })
       <Header
         title="📝 Easy Commit - Commit Type"
         subtitle="Select the type of change you're committing"
-      />
-
-      <ProgressBar current={1} total={7} />
+      >
+        <ProgressBar current={1} total={7} />
+      </Header>
 
       <Box flexDirection="column" marginTop={1}>
         {COMMIT_TYPES.map((commitType, index) => {

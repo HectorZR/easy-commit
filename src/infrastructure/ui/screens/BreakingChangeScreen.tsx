@@ -44,9 +44,9 @@ export const BreakingChangeScreen: React.FC<ScreenProps> = ({
       <Header
         title="📝 Easy Commit - Breaking Change"
         subtitle="Does this commit introduce breaking changes?"
-      />
-
-      <ProgressBar current={5} total={7} />
+      >
+        <ProgressBar current={5} total={7} />
+      </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
         <Text>{text.label('Breaking Change:')}</Text>

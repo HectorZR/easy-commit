@@ -25,7 +25,7 @@ export interface Logger {
  * (stdout is used by ink for the TUI)
  */
 export class ConsoleLogger implements Logger {
-  constructor(private level: LogLevel = LogLevel.INFO) {}
+  constructor(private level: LogLevel = LogLevel.SILENT) {}
 
   debug(message: string, ...args: any[]): void {
     if (this.level <= LogLevel.DEBUG) {

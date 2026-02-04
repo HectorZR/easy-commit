@@ -59,9 +59,9 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
       <Header
         title="📝 Easy Commit - Description"
         subtitle="Provide a short, imperative description of the change"
-      />
-
-      <ProgressBar current={2} total={7} />
+      >
+        <ProgressBar current={2} total={7} />
+      </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
         <Text>{text.label('Description:')}</Text>

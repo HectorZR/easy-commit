@@ -54,9 +54,9 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
 
   return (
     <Box flexDirection="column">
-      <Header title="📝 Easy Commit - Body" subtitle="Provide additional context (optional)" />
-
-      <ProgressBar current={4} total={7} />
+      <Header title="📝 Easy Commit - Body" subtitle="Provide additional context (optional)">
+        <ProgressBar current={4} total={7} />
+      </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
         <Text>{text.label('Body (optional):')}</Text>

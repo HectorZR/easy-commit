@@ -45,9 +45,9 @@ export const ConfirmationScreen: React.FC<ScreenProps> = ({ state, onNext, onBac
 
   return (
     <Box flexDirection="column">
-      <Header title="📝 Easy Commit - Confirmation" subtitle="Ready to create the commit?" />
-
-      <ProgressBar current={7} total={7} />
+      <Header title="📝 Easy Commit - Confirmation" subtitle="Ready to create the commit?">
+        <ProgressBar current={7} total={7} />
+      </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
         <Text>{text.label('Final check:')}</Text>

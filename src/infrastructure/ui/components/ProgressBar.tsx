@@ -1,6 +1,6 @@
 import { Box, Text } from 'ink';
 import React from 'react';
-import { colors } from '../styles';
+import { text } from '../styles';
 
 interface ProgressBarProps {
   current: number;
@@ -11,20 +11,18 @@ interface ProgressBarProps {
  * Progress bar showing wizard step progress
  */
 export const ProgressBar: React.FC<ProgressBarProps> = ({ current, total }) => {
-  const progress = current / total;
-  const barWidth = 30;
-  const filledWidth = Math.floor(barWidth * progress);
-  const emptyWidth = barWidth - filledWidth;
-
-  const filled = '█'.repeat(filledWidth);
-  const empty = '░'.repeat(emptyWidth);
-
   return (
-    <Box flexDirection="column" marginBottom={1}>
-      <Text>
-        {colors.primary(filled)}
-        {colors.muted(empty)} {current}/{total}
-      </Text>
+    <Box
+      flexDirection="column"
+      marginBottom={1}
+      borderStyle="single"
+      borderTop={false}
+      borderLeft={false}
+      borderRight={false}
+      width={10}
+      borderColor="gray"
+    >
+      <Text italic>{text.subtitle(`Step ${current}/${total}`)}</Text>
     </Box>
   );
 };
