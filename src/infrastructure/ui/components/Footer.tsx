@@ -23,7 +23,7 @@ interface CustomFooterProps {
  */
 export const CustomFooter: React.FC<CustomFooterProps> = ({ hints }) => {
   return (
-    <Box flexDirection="column" marginTop={1} paddingTop={1} borderStyle="single" borderTop>
+    <Box flexDirection="row" gap={2} marginTop={1} paddingTop={1}>
       {hints.map((hint) => (
         <Text key={hint}>{text.hint(hint)}</Text>
       ))}

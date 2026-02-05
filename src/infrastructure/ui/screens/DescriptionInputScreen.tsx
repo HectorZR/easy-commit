@@ -1,11 +1,12 @@
-import { Box, Text, useInput } from 'ink';
-import TextInput from 'ink-text-input';
 import React from 'react';
 import { useState } from 'react';
-import { CustomFooter, Header, ProgressBar, ValidationMessage } from '../components';
-import { text } from '../styles';
+import { TextInput } from '../components';
 import type { ScreenProps } from '../types';
+import { Box, Text, useInput } from 'ink';
+import { CustomFooter, Header, ProgressBar } from '../components';
+import { text } from '../styles';
 
+const MAX_LENGTH = 72;
 /**
  * Description Input Screen - Second step of the wizard
  * Allows user to enter commit description
@@ -17,10 +18,8 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
   onCancel,
 }) => {
   const [description, setDescription] = useState(state.description || '');
-  const [errors, setErrors] = useState<string[]>([]);
 
-  const maxLength = 72;
-  const remainingChars = maxLength - description.length;
+  const currentChars = description.length;
 
   useInput((input, key) => {
     if (key.escape) {
@@ -32,33 +31,24 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
 
   const handleSubmit = (value: string) => {
     const trimmed = value.trim();
-    const validationErrors: string[] = [];
 
-    if (!trimmed) {
-      validationErrors.push('Description cannot be empty');
-    } else if (trimmed.length > maxLength) {
-      validationErrors.push(`Description too long (${trimmed.length}/${maxLength})`);
-    } else if (trimmed.length > 0) {
-      const firstChar = trimmed[0];
-      if (firstChar && firstChar !== firstChar.toLowerCase()) {
-        validationErrors.push('Description should start with lowercase letter');
-      }
-    }
-
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
+    const firstChar = trimmed?.[0];
+    if (!trimmed || trimmed.length > MAX_LENGTH || (trimmed.length > 0 && firstChar && firstChar !== firstChar.toLowerCase())) {
       return;
     }
 
-    setErrors([]);
     onNext({ description: trimmed });
+  };
+
+  const handleChange = (value: string) => {
+    setDescription(value);
   };
 
   return (
     <Box flexDirection="column">
       <Header
         title="📝 Easy Commit - Description"
-        subtitle="Provide a short, imperative description of the change"
+        subtitle="Use present tense and lowercase (e.g., 'add feature' not 'Added feature')"
       >
         <ProgressBar current={2} total={7} />
       </Header>
@@ -66,26 +56,26 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
         <Text>{text.label('Description:')}</Text>
         <Box marginTop={1}>
-          <Text>{text.value(state.type)}: </Text>
+          <Text>{text.value('→')} </Text>
           <TextInput
             value={description}
-            onChange={setDescription}
+            onChange={handleChange}
             onSubmit={handleSubmit}
             placeholder="add user authentication"
+            limit={MAX_LENGTH}
           />
         </Box>
         <Box marginTop={1}>
           <Text>
-            {remainingChars >= 0
-              ? text.hint(`${remainingChars} characters remaining`)
-              : text.error(`${Math.abs(remainingChars)} characters over limit`)}
+            {text.hint('Characters: ')}
+            {currentChars > MAX_LENGTH - 15
+              ? text.warning(`${currentChars}/${MAX_LENGTH}`)
+              : text.success(`${currentChars}/${MAX_LENGTH}`)}
           </Text>
         </Box>
       </Box>
 
-      <ValidationMessage errors={errors} />
-
-      <CustomFooter hints={['Enter to submit', 'Ctrl+B to go back', 'Esc to cancel']} />
+      <CustomFooter hints={['[Enter] Submit', '[Ctrl+B] Back', '[Esc] Cancel']} />
     </Box>
   );
 };
