@@ -6,6 +6,7 @@ import { CustomFooter, Header, ProgressBar, ValidationMessage } from '../compone
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
 
+const MAX_LENGTH = 500;
 /**
  * Body Input Screen - Fourth step of the wizard
  * Allows user to optionally enter a longer commit body
@@ -14,8 +15,7 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
   const [body, setBody] = useState(state.body || '');
   const [errors, setErrors] = useState<string[]>([]);
 
-  const maxLength = 500;
-  const remainingChars = maxLength - body.length;
+  const remainingChars = MAX_LENGTH - body.length;
 
   useInput((input, key) => {
     if (key.escape) {
@@ -39,8 +39,8 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
     }
 
     // Validate body length if provided
-    if (trimmed.length > maxLength) {
-      validationErrors.push(`Body too long (${trimmed.length}/${maxLength})`);
+    if (trimmed.length > MAX_LENGTH) {
+      validationErrors.push(`Body too long (${trimmed.length}/${MAX_LENGTH})`);
     }
 
     if (validationErrors.length > 0) {

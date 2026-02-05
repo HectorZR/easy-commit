@@ -32,28 +32,31 @@ export const TypeSelectionScreen: React.FC<ScreenProps> = ({ onNext, onCancel })
     <Box flexDirection="column">
       <Header
         title="📝 Easy Commit - Commit Type"
-        subtitle="Select the type of change you're committing"
+        subtitle={<Text>{text.label('Select a commit type:')}</Text>}
       >
         <ProgressBar current={1} total={7} />
       </Header>
 
       <Box flexDirection="column" marginTop={1}>
-        {COMMIT_TYPES.map((commitType, index) => {
-          const isSelected = index === selectedIndex;
-          return (
-            <Box key={commitType.name} marginBottom={0}>
-              <Text>
-                {isSelected ? colors.primary(`❯ ${commitType.name}`) : `  ${commitType.name}`}
-              </Text>
-              <Text> - </Text>
-              <Text>
-                {isSelected
-                  ? colors.highlight(commitType.description)
-                  : text.subtitle(commitType.description)}
-              </Text>
-            </Box>
-          );
-        })}
+        <Text>{text.hint("Select the type of change you're committing")}</Text>
+        <Box flexDirection="column" marginTop={1}>
+          {COMMIT_TYPES.map((commitType, index) => {
+            const isSelected = index === selectedIndex;
+            return (
+              <Box key={commitType.name} marginBottom={0}>
+                <Text>
+                  {isSelected ? colors.primary(`❯ ${commitType.name}`) : `  ${commitType.name}`}
+                </Text>
+                <Text> - </Text>
+                <Text>
+                  {isSelected
+                    ? colors.highlight(commitType.description)
+                    : text.subtitle(commitType.description)}
+                </Text>
+              </Box>
+            );
+          })}
+        </Box>
       </Box>
 
       <Footer />

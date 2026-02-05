@@ -33,7 +33,11 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
     const trimmed = value.trim();
 
     const firstChar = trimmed?.[0];
-    if (!trimmed || trimmed.length > MAX_LENGTH || (trimmed.length > 0 && firstChar && firstChar !== firstChar.toLowerCase())) {
+    if (
+      !trimmed ||
+      trimmed.length > MAX_LENGTH ||
+      (trimmed.length > 0 && firstChar && firstChar !== firstChar.toLowerCase())
+    ) {
       return;
     }
 
@@ -48,13 +52,15 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
     <Box flexDirection="column">
       <Header
         title="📝 Easy Commit - Description"
-        subtitle="Use present tense and lowercase (e.g., 'add feature' not 'Added feature')"
+        subtitle={<Text>{text.label('Enter a concise description:')}</Text>}
       >
         <ProgressBar current={2} total={7} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
-        <Text>{text.label('Description:')}</Text>
+        <Text italic>
+          {text.hint("Use present tense and lowercase (e.g., 'add feature' not 'Added feature')")}
+        </Text>
         <Box marginTop={1}>
           <Text>{text.value('→')} </Text>
           <TextInput
