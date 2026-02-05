@@ -1,10 +1,11 @@
 import { Box, Text, useInput } from 'ink';
-import TextInput from 'ink-text-input';
 import React from 'react';
 import { useState } from 'react';
-import { CustomFooter, Header, ProgressBar, ValidationMessage } from '../components';
+import { CustomFooter, Header, ProgressBar, TextInput, ValidationMessage } from '../components';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
+
+const MAX_SCOPE_LENGTH = 20;
 
 /**
  * Scope Input Screen - Third step of the wizard
@@ -19,9 +20,6 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
       onCancel();
     } else if (key.ctrl && input === 'b') {
       onBack();
-    } else if (key.ctrl && input === 's') {
-      // Skip scope (Ctrl+S)
-      onNext({ scope: '' });
     }
   });
 
@@ -38,8 +36,8 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
     // Validate scope format if provided
     if (!/^[a-z0-9-]+$/.test(trimmed)) {
       validationErrors.push('Scope must contain only lowercase letters, numbers, and hyphens');
-    } else if (trimmed.length > 30) {
-      validationErrors.push('Scope too long (max 30 characters)');
+    } else if (trimmed.length > MAX_SCOPE_LENGTH) {
+      validationErrors.push(`Scope too long (max ${MAX_SCOPE_LENGTH} characters)`);
     }
 
     if (validationErrors.length > 0) {
@@ -53,43 +51,35 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
 
   return (
     <Box flexDirection="column">
-      <Header title="📝 Easy Commit - Scope" subtitle="Optionally specify a scope (optional)">
+      <Header
+        title="📝 Easy Commit - Scope"
+        subtitle={<Text>{text.label('Enter a scope (optional):')}</Text>}
+      >
         <ProgressBar current={3} total={7} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
-        <Text>{text.label('Scope (optional):')}</Text>
+        <Text italic>
+          {text.hint(
+            'Scope indicates which part of the codebase is affected (e.g., api, ui, auth)'
+          )}
+        </Text>
+        <Text>{text.hint('Press Enter to skip')}</Text>
         <Box marginTop={1}>
-          <Text>
-            {text.value(state.type)}
-            {scope ? `(${text.value(scope)})` : ''}
-            {': '}
-            {text.hint(state.description)}
-          </Text>
-        </Box>
-        <Box marginTop={1}>
+          <Text>{text.value('→')} </Text>
           <TextInput
             value={scope}
             onChange={setScope}
             onSubmit={handleSubmit}
             placeholder="auth, api, ui, etc. (press Enter to skip)"
+            limit={MAX_SCOPE_LENGTH}
           />
-        </Box>
-        <Box marginTop={1}>
-          <Text>{text.hint('Examples: auth, api, ui, core, cli')}</Text>
         </Box>
       </Box>
 
       <ValidationMessage errors={errors} />
 
-      <CustomFooter
-        hints={[
-          'Enter to submit (or skip)',
-          'Ctrl+S to skip',
-          'Ctrl+B to go back',
-          'Esc to cancel',
-        ]}
-      />
+      <CustomFooter hints={['[Enter] Continue', '[Ctrl+B] Back', '[Esc] Cancel']} />
     </Box>
   );
 };

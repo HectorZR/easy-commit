@@ -16,7 +16,7 @@ interface TextInputProps {
  */
 export function TextInput({ value, onChange, onSubmit, placeholder = '', limit }: TextInputProps) {
   // Cursor position (index in the string)
-  const [cursorOffset, setCursorOffset] = useState(value.length);
+  const [cursorOffset, setCursorOffset] = useState(0);
 
   // Update cursor if value changes externally and cursor is out of bounds
   useEffect(() => {
@@ -60,7 +60,7 @@ export function TextInput({ value, onChange, onSubmit, placeholder = '', limit }
 
     // Insert character
     const nextValue = value.slice(0, cursorOffset) + input + value.slice(cursorOffset);
-    if (limit && ((nextValue.length - 1) >= limit)) return;
+    if (limit && nextValue.length - 1 >= limit) return;
 
     onChange(nextValue);
     setCursorOffset(cursorOffset + 1);
@@ -72,33 +72,29 @@ export function TextInput({ value, onChange, onSubmit, placeholder = '', limit }
   }
 
   // Render text with cursor
-  const renderText = () => {
-    // If we are at the end of the string, append a cursor block
-    if (cursorOffset === value.length) {
-      return (
-        <Text>
-          {text.value(value)}
-          <Text inverse color="magenta">
-            {' '}
-          </Text>
-        </Text>
-      );
-    }
-
-    const beforeCursor = value.slice(0, cursorOffset);
-    const atCursor = value[cursorOffset];
-    const afterCursor = value.slice(cursorOffset + 1);
-
+  // If we are at the end of the string, append a cursor block
+  if (cursorOffset === value.length) {
     return (
       <Text>
-        {text.value(beforeCursor)}
+        {text.value(value)}
         <Text inverse color="magenta">
-          {atCursor}
+          {' '}
         </Text>
-        {text.value(afterCursor)}
       </Text>
     );
-  };
+  }
 
-  return <Text>{renderText()}</Text>;
+  const beforeCursor = value.slice(0, cursorOffset);
+  const atCursor = value[cursorOffset];
+  const afterCursor = value.slice(cursorOffset + 1);
+
+  return (
+    <Text>
+      {text.value(beforeCursor)}
+      <Text inverse color="magenta">
+        {atCursor}
+      </Text>
+      {text.value(afterCursor)}
+    </Text>
+  );
 }

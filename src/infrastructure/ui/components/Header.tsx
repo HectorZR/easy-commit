@@ -4,7 +4,7 @@ import { text } from '../styles';
 
 interface HeaderProps {
   title: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   children?: React.ReactNode;
 }
 
@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = ({ children, title, subtitle }) => 
     <Box flexDirection="column">
       <Text>{text.title(title)}</Text>
       {children}
-      {subtitle && <Text>{text.subtitle(subtitle)}</Text>}
+      {subtitle && typeof subtitle === 'string' ? <Text>{text.subtitle(subtitle)}</Text> : subtitle}
     </Box>
   );
 };
