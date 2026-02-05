@@ -1,8 +1,7 @@
 import { Box, Text, useInput } from 'ink';
-import TextInput from 'ink-text-input';
 import React from 'react';
 import { useState } from 'react';
-import { CustomFooter, Header, ProgressBar, ValidationMessage } from '../components';
+import { CustomFooter, Header, ProgressBar, TextareaInput, ValidationMessage } from '../components';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
 
@@ -15,15 +14,13 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
   const [body, setBody] = useState(state.body || '');
   const [errors, setErrors] = useState<string[]>([]);
 
-  const remainingChars = MAX_LENGTH - body.length;
-
   useInput((input, key) => {
     if (key.escape) {
       onCancel();
     } else if (key.ctrl && input === 'b') {
       onBack();
-    } else if (key.ctrl && input === 's') {
-      // Skip body (Ctrl+S)
+    } else if (key.ctrl && input === 'd') {
+      // Skip body (Ctrl+D)
       onNext({ body: '' });
     }
   });
@@ -54,49 +51,37 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
 
   return (
     <Box flexDirection="column">
-      <Header title="📝 Easy Commit - Body" subtitle="Provide additional context (optional)">
+      <Header
+        title="📝 Easy Commit - Body"
+        subtitle={<Text>{text.label('Enter detailed description (optional):')}</Text>}
+      >
         <ProgressBar current={4} total={7} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
-        <Text>{text.label('Body (optional):')}</Text>
-        <Box marginTop={1}>
-          <Text>
-            {text.value(state.type)}
-            {state.scope ? `(${text.value(state.scope)})` : ''}
-            {': '}
-            {text.hint(state.description)}
-          </Text>
-        </Box>
+        <Text italic>
+          {text.hint(
+            'Provide additional context about the changes. Use ↑↓ to navigate, Enter for new line.'
+          )}
+        </Text>
+        <Text>{text.hint('Press Ctrl+D or Esc then Enter to finish')}</Text>
         <Box marginTop={1} marginBottom={1}>
-          <TextInput
+          <TextareaInput
             value={body}
             onChange={setBody}
             onSubmit={handleSubmit}
-            placeholder="Explain why this change is being made (press Enter to skip)"
+            placeholder="Detailed explanation... (optional)"
+            width={60}
+            height={5}
+            limit={MAX_LENGTH}
           />
-        </Box>
-        <Box>
-          <Text>
-            {remainingChars >= 0
-              ? text.hint(`${remainingChars} characters remaining`)
-              : text.error(`${Math.abs(remainingChars)} characters over limit`)}
-          </Text>
-        </Box>
-        <Box marginTop={1}>
-          <Text>{text.hint('Tip: Explain the motivation for the change, not what changed')}</Text>
         </Box>
       </Box>
 
       <ValidationMessage errors={errors} />
 
       <CustomFooter
-        hints={[
-          'Enter to submit (or skip)',
-          'Ctrl+S to skip',
-          'Ctrl+B to go back',
-          'Esc to cancel',
-        ]}
+        hints={['[Enter] Continue', '[Ctrl+D] Skip', '[Ctrl+B] Back', '[Esc] Cancel']}
       />
     </Box>
   );
