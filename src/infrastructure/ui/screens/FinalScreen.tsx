@@ -80,7 +80,9 @@ export function FinalScreen({ state, onNext, onBack, onCancel, mode }: FinalScre
 
       {mode === 'confirmation' && <Options title="Create this commit?" options={options} />}
 
-      <CustomFooter hints={['[Enter] Continue', '[Ctrl+B] Back', '[Esc] Cancel']} />
+      <CustomFooter
+        hints={['[j/k] [↑/↓] Select', '[Enter] Confirm', '[Ctrl+B] Back', '[Esc] Cancel']}
+      />
     </Box>
   );
 }

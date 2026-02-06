@@ -11,9 +11,10 @@ export type OptionType = {
 interface OptionsProps {
   title: string;
   options: OptionType[];
+  titleColor?: (label: string) => string;
 }
 
-export function Options({ title, options }: OptionsProps) {
+export function Options({ title, options, titleColor }: OptionsProps) {
   const [selected, setSelected] = useState(0);
 
   useInput((input, key) => {
@@ -29,7 +30,7 @@ export function Options({ title, options }: OptionsProps) {
 
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Text>{text.label(title)}</Text>
+      <Text>{titleColor ? titleColor(title) : text.label(title)}</Text>
       {options.map((option, index) => {
         const isSelected = index === selected;
         return <Option {...option} selected={isSelected} key={option.label} />;
