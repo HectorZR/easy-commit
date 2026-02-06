@@ -51,7 +51,7 @@ export class Commit {
 
     // Header: type(scope): description
     const scopePart = this.scope ? `(${this.scope})` : '';
-    const header = `${this.type}${scopePart}: ${this.description}`;
+    const header = `${this.type}${this.breaking ? '!' : ''}${scopePart}: ${this.description}`;
     parts.push(header);
 
     // Body (with blank line)

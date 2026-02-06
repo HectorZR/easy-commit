@@ -38,6 +38,7 @@ async function main() {
     const isInteractive = parser.isInteractive(cliConfig);
 
     if (isInteractive) {
+      console.clear();
       // Interactive mode with TUI
       logger.info('Running in interactive mode with TUI');
       const commit = await runInteractiveTUI();

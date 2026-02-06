@@ -7,9 +7,8 @@ import { useWizardNavigation } from './hooks';
 import {
   BodyInputScreen,
   BreakingChangeScreen,
-  ConfirmationScreen,
   DescriptionInputScreen,
-  PreviewScreen,
+  FinalScreen,
   ScopeInputScreen,
   TypeSelectionScreen,
 } from './screens';
@@ -52,9 +51,9 @@ const App: React.FC<AppProps> = () => {
       case Screen.BREAKING_CHANGE:
         return <BreakingChangeScreen {...screenProps} />;
       case Screen.PREVIEW:
-        return <PreviewScreen {...screenProps} />;
+        return <FinalScreen {...screenProps} mode="preview" />;
       case Screen.CONFIRMATION:
-        return <ConfirmationScreen {...screenProps} />;
+        return <FinalScreen {...screenProps} mode="confirmation" />;
       case Screen.EXIT:
         // Exit will be handled by the parent
         process.exit(0);
@@ -115,9 +114,9 @@ export async function runInteractiveTUI(): Promise<Commit> {
           case Screen.BREAKING_CHANGE:
             return <BreakingChangeScreen {...screenProps} />;
           case Screen.PREVIEW:
-            return <PreviewScreen {...screenProps} />;
+            return <FinalScreen {...screenProps} mode="preview" />;
           case Screen.CONFIRMATION:
-            return <ConfirmationScreen {...screenProps} />;
+            return <FinalScreen {...screenProps} mode="confirmation" />;
           case Screen.EXIT:
             return null;
           default:

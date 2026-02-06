@@ -4,3 +4,6 @@ export { Header } from './Header';
 export { ProgressBar } from './ProgressBar';
 export { TextInput } from './TextInput';
 export { TextareaInput } from './TextareaInput';
+
+export { Options } from './Options';
+export type { OptionType } from './Options';
