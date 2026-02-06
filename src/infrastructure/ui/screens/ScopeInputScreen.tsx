@@ -58,14 +58,14 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
         <ProgressBar current={3} total={5} />
       </Header>
 
-      <Box flexDirection="column" marginTop={1} marginBottom={1}>
+      <Box flexDirection="column" marginTop={1} marginBottom={1} gap={1}>
         <Text italic>
           {text.hint(
             'Scope indicates which part of the codebase is affected (e.g., api, ui, auth)'
           )}
         </Text>
         <Text>{text.hint('Press Enter to skip')}</Text>
-        <Box marginTop={1}>
+        <Box>
           <Text>{text.value('→')} </Text>
           <TextInput
             initialValue={state.scope}

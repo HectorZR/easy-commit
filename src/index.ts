@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { text } from '@infrastructure/ui/styles';
 import { CommitService } from './application/services/commit-service';
 import { createDefaultValidator } from './application/validators/concurrent-validator';
 import { Commit } from './domain/entities/commit';
@@ -42,6 +43,12 @@ async function main() {
       // Interactive mode with TUI
       logger.info('Running in interactive mode with TUI');
       const commit = await runInteractiveTUI();
+
+      if (!commit) {
+        console.warn(text.warning('Commit creation cancelled by user'));
+        process.exit(0);
+      }
+
       console.log();
       await service.createCommit(commit);
       console.log('\n✓ Commit created successfully!');

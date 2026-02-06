@@ -37,9 +37,9 @@ export const TypeSelectionScreen: React.FC<ScreenProps> = ({ onNext, onCancel })
         <ProgressBar current={1} total={5} />
       </Header>
 
-      <Box flexDirection="column" marginTop={1}>
+      <Box flexDirection="column" marginTop={1} gap={1}>
         <Text>{text.hint("Select the type of change you're committing")}</Text>
-        <Box flexDirection="column" marginTop={1}>
+        <Box flexDirection="column">
           {COMMIT_TYPES.map((commitType, index) => {
             const isSelected = index === selectedIndex;
             return (

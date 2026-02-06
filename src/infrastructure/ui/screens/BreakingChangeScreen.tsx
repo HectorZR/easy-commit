@@ -32,7 +32,7 @@ export const BreakingChangeScreen: React.FC<ScreenProps> = ({ onNext, onBack, on
         <ProgressBar current={5} total={5} />
       </Header>
 
-      <Box marginTop={1}>
+      <Box marginTop={1} gap={1} flexDirection="column">
         <Text italic>
           {text.hint(
             'Breaking changes require a major version bump according to semantic versioning'

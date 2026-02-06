@@ -50,13 +50,13 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
         <ProgressBar current={4} total={5} />
       </Header>
 
-      <Box flexDirection="column" marginTop={1} marginBottom={1}>
+      <Box flexDirection="column" marginTop={1} marginBottom={1} gap={1}>
         <Text italic>
           {text.hint(
             'Provide additional context about the changes. Use ↑↓ to navigate, Enter for new line.'
           )}
         </Text>
-        <Box marginTop={1} marginBottom={1}>
+        <Box marginBottom={1}>
           <TextareaInput
             value={body}
             onChange={setBody}

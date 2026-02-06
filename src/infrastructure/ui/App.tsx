@@ -1,4 +1,4 @@
-import { render } from 'ink';
+import { render, useApp } from 'ink';
 import React from 'react';
 import type { Commit } from '../../domain/entities/commit';
 import { useWizardNavigation } from './hooks';
@@ -16,19 +16,19 @@ import { Screen, type WizardState } from './types';
  * Run the interactive TUI wizard
  * Returns a promise that resolves with the completed commit
  */
-export async function runInteractiveTUI(): Promise<Commit> {
+export async function runInteractiveTUI(): Promise<Commit | null> {
   return new Promise((resolve, reject) => {
     let wizardState: WizardState | null = null;
 
     const AppWrapper: React.FC = () => {
       const { state, goNext, goBack } = useWizardNavigation();
+      const { exit } = useApp();
 
       // Save state for access outside React
       wizardState = state;
 
       const handleCancel = () => {
-        reject(new Error('User cancelled'));
-        process.exit(0);
+        exit();
       };
 
       const handleNext = (updates: Partial<WizardState>) => {
@@ -37,6 +37,7 @@ export async function runInteractiveTUI(): Promise<Commit> {
         // Check if we reached EXIT state
         if (updates.currentScreen === Screen.EXIT && wizardState?.commit) {
           resolve(wizardState.commit);
+          exit();
         }
       };
 
@@ -76,12 +77,13 @@ export async function runInteractiveTUI(): Promise<Commit> {
     const { waitUntilExit } = render(<AppWrapper />, { incrementalRendering: true });
 
     // Handle exit
-    waitUntilExit().then(() => {
-      if (wizardState?.commit) {
-        resolve(wizardState.commit);
-      } else {
-        reject(new Error('Wizard exited without creating commit'));
+    waitUntilExit().then(
+      () => {
+        resolve(wizardState?.commit || null);
+      },
+      () => {
+        reject(new Error('Wizard exited with an error'));
       }
-    });
+    );
   });
 }

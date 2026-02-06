@@ -28,7 +28,7 @@ export const ValidationMessage: React.FC<ValidationMessageProps> = ({ errors }) 
   if (errors.length === 0) return null;
 
   return (
-    <Box flexDirection="column" marginTop={1}>
+    <Box flexDirection="column" marginTop={1} gap={1}>
       {errors.map((error) => (
         <Text key={error}>{text.error(error)}</Text>
       ))}

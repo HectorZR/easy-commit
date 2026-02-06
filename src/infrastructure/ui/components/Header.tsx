@@ -13,7 +13,7 @@ interface HeaderProps {
  */
 export const Header: React.FC<HeaderProps> = ({ children, title, subtitle }) => {
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" gap={1}>
       <Text>{text.title(title)}</Text>
       {children}
       {subtitle && typeof subtitle === 'string' ? <Text>{text.subtitle(subtitle)}</Text> : subtitle}

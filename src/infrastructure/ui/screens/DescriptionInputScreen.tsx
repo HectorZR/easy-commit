@@ -51,11 +51,11 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
         <ProgressBar current={2} total={5} />
       </Header>
 
-      <Box flexDirection="column" marginTop={1} marginBottom={1}>
+      <Box flexDirection="column" marginTop={1} marginBottom={1} gap={1}>
         <Text italic>
           {text.hint("Use present tense and lowercase (e.g., 'add feature' not 'Added feature')")}
         </Text>
-        <Box marginTop={1}>
+        <Box>
           <Text>{text.value('→')} </Text>
           <TextInput
             initialValue={state.description}

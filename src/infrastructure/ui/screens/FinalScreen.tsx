@@ -59,11 +59,10 @@ export function FinalScreen({ state, onNext, onBack, onCancel, mode }: FinalScre
         <ProgressBar current={5} total={5} />
       </Header>
 
-      <Box flexDirection="column" marginTop={1} marginBottom={1}>
+      <Box flexDirection="column" marginTop={1} marginBottom={1} gap={1}>
         <Text>{text.label('📝 Commit Preview')}</Text>
         <Box
           flexDirection="column"
-          marginTop={1}
           padding={1}
           borderStyle="round"
           borderColor="blueBright"
