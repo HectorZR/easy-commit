@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CustomFooter, Header, ProgressBar, TextareaInput, ValidationMessage } from '../components';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
+import { InstructionBuilder } from '@domain/instruction-builder';
 
 const MAX_LENGTH = 500;
 /**
@@ -46,7 +47,7 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
         title="📝 Easy Commit - Body"
         subtitle={<Text>{text.label('Enter detailed description (optional):')}</Text>}
       >
-        <ProgressBar current={4} total={7} />
+        <ProgressBar current={4} total={5} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
@@ -55,7 +56,6 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
             'Provide additional context about the changes. Use ↑↓ to navigate, Enter for new line.'
           )}
         </Text>
-        <Text>{text.hint('Press Ctrl+D or Esc then Enter to finish')}</Text>
         <Box marginTop={1} marginBottom={1}>
           <TextareaInput
             value={body}
@@ -72,7 +72,11 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
       <ValidationMessage errors={errors} />
 
       <CustomFooter
-        hints={['[Enter] Continue', '[Ctrl+D] Skip', '[Ctrl+B] Back', '[Esc] Cancel']}
+        hints={new InstructionBuilder()
+          .addCustomHint('[Ctrl+D] Continue')
+          .addBack()
+          .addCancel()
+          .getSteps()}
       />
     </Box>
   );

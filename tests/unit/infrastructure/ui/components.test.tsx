@@ -71,21 +71,21 @@ describe('UI Components', () => {
 
   describe('ProgressBar', () => {
     test('should show current step and total', () => {
-      const { lastFrame } = render(<ProgressBar current={3} total={7} />);
+      const { lastFrame } = render(<ProgressBar current={3} total={5} />);
       const output = lastFrame();
 
       expect(output).toContain('3/7');
     });
 
     test('should show progress at start', () => {
-      const { lastFrame } = render(<ProgressBar current={1} total={7} />);
+      const { lastFrame } = render(<ProgressBar current={1} total={5} />);
       const output = lastFrame();
 
       expect(output).toContain('1/7');
     });
 
     test('should show progress at end', () => {
-      const { lastFrame } = render(<ProgressBar current={7} total={7} />);
+      const { lastFrame } = render(<ProgressBar current={7} total={5} />);
       const output = lastFrame();
 
       expect(output).toContain('7/7');

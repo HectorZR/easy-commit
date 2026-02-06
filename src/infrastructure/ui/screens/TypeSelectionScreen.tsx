@@ -34,7 +34,7 @@ export const TypeSelectionScreen: React.FC<ScreenProps> = ({ onNext, onCancel })
         title="📝 Easy Commit - Commit Type"
         subtitle={<Text>{text.label('Select a commit type:')}</Text>}
       >
-        <ProgressBar current={1} total={7} />
+        <ProgressBar current={1} total={5} />
       </Header>
 
       <Box flexDirection="column" marginTop={1}>

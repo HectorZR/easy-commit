@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CustomFooter, Header, ProgressBar, TextInput, ValidationMessage } from '../components';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
+import { InstructionBuilder } from '@domain/instruction-builder';
 
 const MAX_SCOPE_LENGTH = 20;
 
@@ -55,7 +56,7 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
         title="📝 Easy Commit - Scope"
         subtitle={<Text>{text.label('Enter a scope (optional):')}</Text>}
       >
-        <ProgressBar current={3} total={7} />
+        <ProgressBar current={3} total={5} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
@@ -79,7 +80,9 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
 
       <ValidationMessage errors={errors} />
 
-      <CustomFooter hints={['[Enter] Continue', '[Ctrl+B] Back', '[Esc] Cancel']} />
+      <CustomFooter
+        hints={new InstructionBuilder().addConfirmation().addBack().addCancel().getSteps()}
+      />
     </Box>
   );
 };

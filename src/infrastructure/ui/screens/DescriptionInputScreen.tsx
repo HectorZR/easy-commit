@@ -5,6 +5,7 @@ import type { ScreenProps } from '../types';
 import { Box, Text, useInput } from 'ink';
 import { CustomFooter, Header, ProgressBar } from '../components';
 import { text } from '../styles';
+import { InstructionBuilder } from '@domain/instruction-builder';
 
 const MAX_LENGTH = 72;
 /**
@@ -54,7 +55,7 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
         title="📝 Easy Commit - Description"
         subtitle={<Text>{text.label('Enter a concise description:')}</Text>}
       >
-        <ProgressBar current={2} total={7} />
+        <ProgressBar current={2} total={5} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
@@ -81,7 +82,9 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
         </Box>
       </Box>
 
-      <CustomFooter hints={['[Enter] Submit', '[Ctrl+B] Back', '[Esc] Cancel']} />
+      <CustomFooter
+        hints={new InstructionBuilder().addConfirmation().addBack().addCancel().getSteps()}
+      />
     </Box>
   );
 };

@@ -4,6 +4,7 @@ import React from 'react';
 import { Screen, type ScreenProps } from '../types';
 import { CustomFooter, Header, Options, type OptionType, ProgressBar } from '../components';
 import { colors, text } from '../styles';
+import { InstructionBuilder } from '@domain/instruction-builder';
 
 interface FinalScreenProps extends ScreenProps {
   mode: 'preview' | 'confirmation';
@@ -55,7 +56,7 @@ export function FinalScreen({ state, onNext, onBack, onCancel, mode }: FinalScre
           </Text>
         }
       >
-        <ProgressBar current={mode === 'preview' ? 6 : 7} total={7} />
+        <ProgressBar current={5} total={5} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1}>
@@ -81,7 +82,12 @@ export function FinalScreen({ state, onNext, onBack, onCancel, mode }: FinalScre
       {mode === 'confirmation' && <Options title="Create this commit?" options={options} />}
 
       <CustomFooter
-        hints={['[j/k] [↑/↓] Select', '[Enter] Confirm', '[Ctrl+B] Back', '[Esc] Cancel']}
+        hints={new InstructionBuilder()
+          .addNavigation()
+          .addConfirmation()
+          .addBack()
+          .addCancel()
+          .getSteps()}
       />
     </Box>
   );

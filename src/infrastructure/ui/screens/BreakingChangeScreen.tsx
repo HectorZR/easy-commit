@@ -3,6 +3,7 @@ import React from 'react';
 import { CustomFooter, Header, Options, type OptionType, ProgressBar } from '../components';
 import { colors, text } from '../styles';
 import type { ScreenProps } from '../types';
+import { InstructionBuilder } from '@domain/instruction-builder';
 
 /**
  * Breaking Change Screen - Fifth step of the wizard
@@ -28,7 +29,7 @@ export const BreakingChangeScreen: React.FC<ScreenProps> = ({ onNext, onBack, on
         title="📝 Easy Commit - Breaking Change"
         subtitle={<Text>{text.label('Breaking Change:')}</Text>}
       >
-        <ProgressBar current={5} total={7} />
+        <ProgressBar current={5} total={5} />
       </Header>
 
       <Box marginTop={1}>
@@ -50,7 +51,12 @@ export const BreakingChangeScreen: React.FC<ScreenProps> = ({ onNext, onBack, on
       </Box>
 
       <CustomFooter
-        hints={['[j/k] [↑/↓] Select', '[Enter] Confirm', '[Ctrl+B] Back', '[Esc] Cancel']}
+        hints={new InstructionBuilder()
+          .addNavigation()
+          .addConfirmation()
+          .addBack()
+          .addCancel()
+          .getSteps()}
       />
     </Box>
   );
