@@ -13,7 +13,6 @@ const MAX_SCOPE_LENGTH = 20;
  * Allows user to optionally enter commit scope
  */
 export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, onCancel }) => {
-  const [scope, setScope] = useState(state.scope || '');
   const [errors, setErrors] = useState<string[]>([]);
 
   useInput((input, key) => {
@@ -69,8 +68,7 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
         <Box marginTop={1}>
           <Text>{text.value('→')} </Text>
           <TextInput
-            value={scope}
-            onChange={setScope}
+            initialValue={state.scope}
             onSubmit={handleSubmit}
             placeholder="auth, api, ui, etc. (press Enter to skip)"
             limit={MAX_SCOPE_LENGTH}

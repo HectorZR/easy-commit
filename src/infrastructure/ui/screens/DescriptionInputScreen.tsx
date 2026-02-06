@@ -1,5 +1,4 @@
 import React from 'react';
-import { useState } from 'react';
 import { TextInput } from '../components';
 import type { ScreenProps } from '../types';
 import { Box, Text, useInput } from 'ink';
@@ -18,9 +17,7 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
   onBack,
   onCancel,
 }) => {
-  const [description, setDescription] = useState(state.description || '');
-
-  const currentChars = description.length;
+  const currentChars = state.description.length;
 
   useInput((input, key) => {
     if (key.escape) {
@@ -45,10 +42,6 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
     onNext({ description: trimmed });
   };
 
-  const handleChange = (value: string) => {
-    setDescription(value);
-  };
-
   return (
     <Box flexDirection="column">
       <Header
@@ -65,20 +58,11 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
         <Box marginTop={1}>
           <Text>{text.value('→')} </Text>
           <TextInput
-            value={description}
-            onChange={handleChange}
+            initialValue={state.description}
             onSubmit={handleSubmit}
             placeholder="add user authentication"
             limit={MAX_LENGTH}
           />
-        </Box>
-        <Box marginTop={1}>
-          <Text>
-            {text.hint('Characters: ')}
-            {currentChars > MAX_LENGTH - 15
-              ? text.warning(`${currentChars}/${MAX_LENGTH}`)
-              : text.success(`${currentChars}/${MAX_LENGTH}`)}
-          </Text>
         </Box>
       </Box>
 
