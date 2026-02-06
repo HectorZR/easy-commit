@@ -1,6 +1,7 @@
-import { text } from '../styles';
-import React, { useEffect, useState } from 'react';
 import { Box, Text, useInput } from 'ink';
+import React from 'react';
+import { useEffect, useState } from 'react';
+import { text } from '../styles';
 
 interface TextInputProps {
   initialValue: string | undefined;
@@ -28,7 +29,7 @@ export function TextInput({
     if (cursorOffset > internalValue.length) {
       setCursorOffset(internalValue.length);
     }
-  }, [internalValue, cursorOffset]);
+  }, [internalValue]);
 
   useInput((input, key) => {
     if (key.return && onSubmit) {
@@ -61,50 +62,41 @@ export function TextInput({
     }
 
     // Insert character
-    const nextValue =
-      internalValue.slice(0, cursorOffset) + input + internalValue.slice(cursorOffset);
-    if (limit && nextValue.length - 1 >= limit) return;
+    const sanitized = input.replace(/[\r\n\t]/g, '');
+    if (!sanitized) return;
+
+    let nextValue =
+      internalValue.slice(0, cursorOffset) + sanitized + internalValue.slice(cursorOffset);
+
+    // Truncate if limit exceeded
+    if (limit && nextValue.length > limit) {
+      nextValue = nextValue.slice(0, limit);
+    }
 
     setInternalValue(nextValue);
-    setCursorOffset(cursorOffset + 1);
+
+    // Move cursor forward, but ensure it doesn't exceed new value length
+    setCursorOffset(Math.min(nextValue.length, cursorOffset + sanitized.length));
   });
 
-  // If empty, show placeholder
-  if (!internalValue && placeholder) {
-    return (
-      <CharactersLeft current={internalValue.length} limit={limit || 999}>
-        <Text color="gray">{placeholder}</Text>
-      </CharactersLeft>
-    );
-  }
-
-  // Render text with cursor
-  // If we are at the end of the string, append a cursor block
-  if (cursorOffset === internalValue.length) {
-    return (
-      <CharactersLeft current={internalValue.length} limit={limit || 999}>
-        <Text>
-          {text.value(internalValue)}
+  return (
+    <CharactersLeft current={internalValue.length} limit={limit}>
+      <Text>
+        {text.value(internalValue.slice(0, cursorOffset))}
+        {cursorOffset === internalValue.length ? (
           <Text inverse color="magenta">
             {' '}
           </Text>
-        </Text>
-      </CharactersLeft>
-    );
-  }
-
-  const beforeCursor = internalValue.slice(0, cursorOffset);
-  const atCursor = internalValue[cursorOffset];
-  const afterCursor = internalValue.slice(cursorOffset + 1);
-
-  return (
-    <CharactersLeft current={internalValue.length} limit={limit || 999}>
-      <Text>
-        {text.value(beforeCursor)}
-        <Text inverse color="magenta">
-          {atCursor}
-        </Text>
-        {text.value(afterCursor)}
+        ) : (
+          <Text inverse color="magenta">
+            {internalValue[cursorOffset]}
+          </Text>
+        )}
+        {!internalValue && placeholder ? (
+          <Text color="gray">{placeholder}</Text>
+        ) : (
+          text.value(internalValue.slice(cursorOffset + 1))
+        )}
       </Text>
     </CharactersLeft>
   );
@@ -112,11 +104,15 @@ export function TextInput({
 
 interface CharactersLeftProps {
   current: number;
-  limit: number;
+  limit?: number;
   children?: React.ReactNode;
 }
 
 function CharactersLeft({ current, limit, children }: CharactersLeftProps) {
+  if (!limit) {
+    return <Box flexDirection="column">{children}</Box>;
+  }
+
   return (
     <Box flexDirection="column">
       {children}
