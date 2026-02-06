@@ -19,21 +19,12 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
       onCancel();
     } else if (key.ctrl && input === 'b') {
       onBack();
-    } else if (key.ctrl && input === 'd') {
-      // Skip body (Ctrl+D)
-      onNext({ body: '' });
     }
   });
 
   const handleSubmit = (value: string) => {
     const trimmed = value.trim();
     const validationErrors: string[] = [];
-
-    // Body is optional, empty is valid
-    if (trimmed === '') {
-      onNext({ body: '' });
-      return;
-    }
 
     // Validate body length if provided
     if (trimmed.length > MAX_LENGTH) {

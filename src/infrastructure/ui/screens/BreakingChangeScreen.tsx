@@ -23,9 +23,9 @@ export const BreakingChangeScreen: React.FC<ScreenProps> = ({
   ];
 
   useInput((input, key) => {
-    if (key.upArrow || key.leftArrow) {
+    if (key.upArrow || input === 'k') {
       setSelected((prev) => (prev > 0 ? prev - 1 : options.length - 1));
-    } else if (key.downArrow || key.rightArrow) {
+    } else if (key.downArrow || input === 'j') {
       setSelected((prev) => (prev < options.length - 1 ? prev + 1 : 0));
     } else if (key.return) {
       const selectedOption = options[selected];
@@ -43,22 +43,10 @@ export const BreakingChangeScreen: React.FC<ScreenProps> = ({
     <Box flexDirection="column">
       <Header
         title="📝 Easy Commit - Breaking Change"
-        subtitle="Does this commit introduce breaking changes?"
+        subtitle={<Text>{colors.warning('Breaking Change:')}</Text>}
       >
         <ProgressBar current={5} total={7} />
       </Header>
-
-      <Box flexDirection="column" marginTop={1} marginBottom={1}>
-        <Text>{text.label('Breaking Change:')}</Text>
-        <Box marginTop={1}>
-          <Text>
-            {text.value(state.type)}
-            {state.scope ? `(${text.value(state.scope)})` : ''}
-            {': '}
-            {text.hint(state.description)}
-          </Text>
-        </Box>
-      </Box>
 
       <Box flexDirection="column" marginTop={1}>
         {options.map((option, index) => {
@@ -75,11 +63,11 @@ export const BreakingChangeScreen: React.FC<ScreenProps> = ({
       </Box>
 
       <Box marginTop={1}>
-        <Text>{text.hint('Breaking changes require a major version bump (x.0.0)')}</Text>
+        <Text>{text.hint('(Breaking changes require a major version bump)')}</Text>
       </Box>
 
       <CustomFooter
-        hints={['↑/↓ to select', 'Enter to confirm', 'Ctrl+B to go back', 'Esc to cancel']}
+        hints={['[j/k] [↑/↓] Select', '[Enter] Confirm', '[Ctrl+B] Back', '[Esc] Cancel']}
       />
     </Box>
   );

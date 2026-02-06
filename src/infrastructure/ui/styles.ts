@@ -7,7 +7,7 @@ export const colors = {
   primary: chalk.bold.magentaBright,
   success: chalk.green,
   error: chalk.red,
-  warning: chalk.yellow,
+  warning: chalk.bold.yellow,
   info: chalk.blue,
   muted: chalk.gray,
   highlight: chalk.bold.white,
