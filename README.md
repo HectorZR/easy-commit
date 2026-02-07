@@ -23,7 +23,15 @@ A modern CLI application built with TypeScript and Bun to create commits followi
 
 ## 📦 Installation
 
-### Option 1: Download Pre-built Binary (Recommended)
+### Option 1: Quick Install (Recommended)
+
+Install the latest version with a single command (macOS, Linux, WSL):
+
+```bash
+curl -sSL https://raw.githubusercontent.com/HectorZR/easy-commit/main/install.sh | sh
+```
+
+### Option 2: Download Pre-built Binary
 
 Download the latest standalone binary for your platform from the [releases page](https://github.com/HectorZR/easy-commit/releases/latest):
 
@@ -54,7 +62,7 @@ sudo mv easy-commit-darwin-arm64 /usr/local/bin/easy-commit
 # Move easy-commit-windows-x64.exe to a directory in your PATH
 ```
 
-### Option 2: Install with Bun
+### Option 3: Install with Bun
 
 If you have Bun installed:
 
@@ -62,7 +70,7 @@ If you have Bun installed:
 bun install -g easy-commit
 ```
 
-### Option 3: Build from Source
+### Option 4: Build from Source
 
 ```bash
 # Clone the repository
