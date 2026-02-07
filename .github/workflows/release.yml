@@ -137,6 +137,7 @@ jobs:
           cat CHANGELOG.md
 
       - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: release/*
