@@ -80,6 +80,6 @@ export function parseLogLevel(level: string): LogLevel {
     case 'SILENT':
       return LogLevel.SILENT;
     default:
-      return LogLevel.INFO;
+      return LogLevel.SILENT;
   }
 }

@@ -3,6 +3,7 @@ import { text } from '@infrastructure/ui/styles';
 import { CommitService } from './application/services/commit-service';
 import { createDefaultValidator } from './application/validators/concurrent-validator';
 import { Commit } from './domain/entities/commit';
+import { DomainError } from './domain/errors';
 import { CliParser } from './infrastructure/cli/cli-parser';
 import { ConfigLoader } from './infrastructure/config/config-loader';
 import { GitExecutor } from './infrastructure/git/git-executor';
@@ -81,9 +82,15 @@ async function main() {
       console.log('✓ Commit created successfully!');
     }
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(`Error: ${error.message}`);
-      logger.error('Error:', error);
+    if (error instanceof DomainError) {
+      console.log(text.error(`Error: ${error.message}`));
+      process.exit(0);
+    } else if (error instanceof Error) {
+      console.log(text.error(`Error: ${error.message}`));
+      if (logLevel === 0) { // LogLevel.DEBUG
+        logger.error('Stack trace:', error);
+      }
+      process.exit(1);
     }
     process.exit(1);
   }

@@ -24,7 +24,6 @@ export function FinalScreen({ state, onNext, onBack, onCancel, mode }: FinalScre
       label: 'Yes',
       onSelect: () => {
         onNext({ currentScreen: Screen.EXIT });
-        console.log(colors.success('✅ Commit created successfully!'));
       },
       color: colors.success.bold,
     },
@@ -61,12 +60,7 @@ export function FinalScreen({ state, onNext, onBack, onCancel, mode }: FinalScre
 
       <Box flexDirection="column" marginTop={1} marginBottom={1} gap={1}>
         <Text>{text.label('📝 Commit Preview')}</Text>
-        <Box
-          flexDirection="column"
-          padding={1}
-          borderStyle="round"
-          borderColor="blueBright"
-        >
+        <Box flexDirection="column" padding={1} borderStyle="round" borderColor="blueBright">
           {formattedMessage
             .split('\n')
             .filter((line) => Boolean(line))
