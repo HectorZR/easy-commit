@@ -116,15 +116,16 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          path: release
+          pattern: easy-commit-*
+          merge-multiple: true
 
       - name: Display structure of downloaded files
-        run: ls -R artifacts
+        run: ls -R release
 
       - name: Prepare release files
         run: |
-          mkdir -p release
-          find artifacts -type f \( -name "*.tar.gz" -o -name "*.zip" -o -name "*.sha256" \) -exec cp {} release/ \;
+          # No need to copy/find, artifacts are already in release/ thanks to merge-multiple
           ls -lh release/
 
       - name: Generate changelog
