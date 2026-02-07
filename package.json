@@ -1,6 +1,6 @@
 {
   "name": "easy-commit",
-  "version": "0.0.0",
+  "version": "1.1.0",
   "description": "Create conventional commits with an interactive TUI",
   "type": "module",
   "bin": {
@@ -18,7 +18,8 @@
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist node_modules easy-commit"
+    "clean": "rm -rf dist node_modules easy-commit",
+    "ci:publish": "changeset tag"
   },
   "keywords": [
     "git",
@@ -31,6 +32,7 @@
   "license": "MIT",
   "devDependencies": {
     "@biomejs/biome": "^2.3.12",
+    "@changesets/cli": "^2.29.8",
     "@types/bun": "latest",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.0.10",
