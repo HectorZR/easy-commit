@@ -35,8 +35,12 @@ async function main() {
 
   // 3. Build standalone binary
   console.log('⚡ Compiling standalone binary...');
+
+  const isWindows = process.platform === 'win32';
+  const binaryName = isWindows ? 'easy-commit.exe' : 'easy-commit';
+
   try {
-    await $`bun build src/index.ts --compile --outfile easy-commit`.env({
+    await $`bun build src/index.ts --compile --outfile ${binaryName}`.env({
       VERSION: version,
       COMMIT: commit,
       BUILD_DATE: buildDate,
@@ -45,14 +49,14 @@ async function main() {
     console.log('✅ Build complete!\n');
 
     // 4. Show binary info
-    const stats = await Bun.file('easy-commit').stat();
+    const stats = await Bun.file(binaryName).stat();
     const sizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
     console.log(`📊 Binary size: ${sizeInMB} MB`);
-    console.log(`📁 Output: ./easy-commit\n`);
+    console.log(`📁 Output: ./${binaryName}\n`);
 
     // 5. Test the binary
     console.log('🧪 Testing binary...');
-    const testResult = await $`./easy-commit --version`.text();
+    const testResult = await $`./${binaryName} --version`.text();
     console.log(`   Version output: ${testResult.trim()}`);
     console.log('\n🎉 Build successful!');
   } catch (error) {
