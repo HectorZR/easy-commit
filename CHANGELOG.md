@@ -1,5 +1,11 @@
 # easy-commit
 
+## 2.0.3
+
+### Patch Changes
+
+- bbc81d1: fix: flatten artifact download structure for release
+
 ## 2.0.2
 
 ### Patch Changes
