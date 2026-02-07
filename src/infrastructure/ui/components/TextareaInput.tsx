@@ -48,19 +48,36 @@ export function TextareaInput({
 
     // Backspace / Delete
     if (key.backspace || key.delete) {
-      const actionType = key.delete ? 'DELETE_AFTER' : 'DELETE_BEFORE';
-      const action = { type: actionType } as const;
-      dispatch(action);
+      // Treat both as backspace for better compatibility (matches TextInput behavior)
+      dispatch({ type: 'DELETE_BEFORE' });
       return;
     }
 
     // Navigation
-    if (key.leftArrow) { dispatch({ type: 'NAVIGATE', direction: 'LEFT' }); return; }
-    if (key.rightArrow) { dispatch({ type: 'NAVIGATE', direction: 'RIGHT' }); return; }
-    if (key.upArrow) { dispatch({ type: 'NAVIGATE', direction: 'UP' }); return; }
-    if (key.downArrow) { dispatch({ type: 'NAVIGATE', direction: 'DOWN' }); return; }
-    if (key.home) { dispatch({ type: 'NAVIGATE', direction: 'HOME' }); return; }
-    if (key.end) { dispatch({ type: 'NAVIGATE', direction: 'END' }); return; }
+    if (key.leftArrow) {
+      dispatch({ type: 'NAVIGATE', direction: 'LEFT' });
+      return;
+    }
+    if (key.rightArrow) {
+      dispatch({ type: 'NAVIGATE', direction: 'RIGHT' });
+      return;
+    }
+    if (key.upArrow) {
+      dispatch({ type: 'NAVIGATE', direction: 'UP' });
+      return;
+    }
+    if (key.downArrow) {
+      dispatch({ type: 'NAVIGATE', direction: 'DOWN' });
+      return;
+    }
+    if (key.home) {
+      dispatch({ type: 'NAVIGATE', direction: 'HOME' });
+      return;
+    }
+    if (key.end) {
+      dispatch({ type: 'NAVIGATE', direction: 'END' });
+      return;
+    }
 
     if (key.ctrl || key.meta) return;
 
@@ -72,7 +89,7 @@ export function TextareaInput({
   // Render logic
   const visibleStart = Math.max(0, cursor.line - height + 1);
   const visibleLines = lines.slice(visibleStart, visibleStart + height);
-  
+
   // Fill empty space
   while (visibleLines.length < height) {
     visibleLines.push('');
@@ -84,7 +101,7 @@ export function TextareaInput({
     return (
       <Box flexDirection="column">
         {Array.from({ length: height }).map((_, i) => (
-          <Box key={i}>
+          <Box key={`line-${String(i)}`}>
             <Text color="magentaBright">{'→'} </Text>
             {i === 0 ? <Text color="gray">{placeholder}</Text> : <Text>{''}</Text>}
           </Box>
