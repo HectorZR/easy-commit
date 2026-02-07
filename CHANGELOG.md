@@ -1,5 +1,11 @@
 # easy-commit
 
+## 2.0.5
+
+### Patch Changes
+
+- 6261083: refactor(cli): adjust version display
+
 ## 2.0.4
 
 ### Patch Changes
