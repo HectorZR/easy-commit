@@ -49,32 +49,41 @@ export class Commit {
   format(): string {
     const parts: string[] = [];
 
-    // Header: type(scope): description
-    const scopePart = this.scope ? `(${this.scope})` : '';
-    const header = `${this.type}${this.breaking ? '!' : ''}${scopePart}: ${this.description}`;
-    parts.push(header);
+    parts.push(this.getHeader());
 
     // Body (with blank line)
     if (this.body) {
       parts.push('');
-      parts.push(this.wrapBody(this.body));
+      parts.push(this.getBody());
     }
 
     // Footer: Breaking change
     if (this.breaking) {
       parts.push('');
-      parts.push('BREAKING CHANGE: This commit introduces breaking changes');
+      parts.push(this.getBreaking());
     }
 
     return parts.join('\n');
+  }
+
+  getHeader() {
+    // Header: type(scope): description
+    const scopePart = this.scope ? `(${this.scope})` : '';
+    const header = `${this.type}${this.breaking ? '!' : ''}${scopePart}: ${this.description}`;
+
+    return header;
   }
 
   /**
    * Returns the body text as-is, preserving user formatting.
    * Automatic wrapping has been disabled to respect manual line breaks.
    */
-  private wrapBody(text: string): string {
-    return text;
+  getBody() {
+    return this.body ?? '';
+  }
+
+  getBreaking() {
+    return 'BREAKING CHANGE: This commit introduces breaking changes';
   }
 
   isBreaking(): boolean {

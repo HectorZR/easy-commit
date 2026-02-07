@@ -43,8 +43,6 @@ export function FinalScreen({ state, onNext, onBack, onCancel, mode }: FinalScre
     }
   });
 
-  const formattedMessage = commit.format();
-
   return (
     <Box flexDirection="column">
       <Header
@@ -61,14 +59,27 @@ export function FinalScreen({ state, onNext, onBack, onCancel, mode }: FinalScre
       <Box flexDirection="column" marginTop={1} marginBottom={1} gap={1}>
         <Text>{text.label('📝 Commit Preview')}</Text>
         <Box flexDirection="column" padding={1} borderStyle="round" borderColor="blueBright">
-          {formattedMessage
-            .split('\n')
-            .filter((line) => Boolean(line))
-            .map((line, index) => (
-              <Box marginTop={Number(index !== 0)} key={line || `empty-${Math.random()}`}>
-                <Text>{colors.highlight(line)}</Text>
-              </Box>
-            ))}
+          {/* Header */}
+          <Text>{colors.highlight(commit.getHeader())}</Text>
+
+          {/* Body */}
+          {commit.body && (
+            <Box marginTop={1} flexDirection="column">
+              {commit
+                .getBody()
+                .split('\n')
+                .map((line) => (
+                  <Text key={line}>{colors.highlight(line)}</Text>
+                ))}
+            </Box>
+          )}
+
+          {/* Breaking Changes Footer */}
+          {commit.isBreaking() && (
+            <Box marginTop={1}>
+              <Text>{colors.highlight(commit.getBreaking())}</Text>
+            </Box>
+          )}
         </Box>
       </Box>
 
