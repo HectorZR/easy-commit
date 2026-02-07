@@ -1,5 +1,11 @@
 # easy-commit
 
+## 2.0.2
+
+### Patch Changes
+
+- ea51787: fix: explicit artifact upload patterns
+
 ## 2.0.1
 
 ### Patch Changes
