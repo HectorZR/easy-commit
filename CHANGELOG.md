@@ -1,5 +1,11 @@
 # easy-commit
 
+## 2.0.4
+
+### Patch Changes
+
+- 8019945: fix: release action
+
 ## 2.0.3
 
 ### Patch Changes
