@@ -15,7 +15,7 @@ BINARY_NAME="easy-commit"
 
 # GitHub URLs
 GITHUB_API="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}"
-GITHUB_RELEASES="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download"
+GITHUB_RELEASES="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag"
 
 # Colors for output
 if [ -t 1 ]; then
@@ -67,7 +67,7 @@ fatal() {
 
 check_dependencies() {
   info "Checking dependencies..."
-  
+
   # Check for curl or wget
   if command -v curl >/dev/null 2>&1; then
     DOWNLOAD_CMD="curl"
@@ -76,21 +76,21 @@ check_dependencies() {
   else
     fatal "Neither curl nor wget found. Please install one of them."
   fi
-  
+
   # Check for tar (Linux/macOS)
   if [ "$OS" != "windows" ]; then
     if ! command -v tar >/dev/null 2>&1; then
       fatal "tar not found. Please install tar."
     fi
   fi
-  
+
   # Check for unzip (Windows)
   if [ "$OS" = "windows" ]; then
     if ! command -v unzip >/dev/null 2>&1; then
       fatal "unzip not found. Please install unzip."
     fi
   fi
-  
+
   success "All dependencies found"
 }
 
@@ -100,7 +100,7 @@ check_dependencies() {
 
 detect_platform() {
   info "Detecting platform..."
-  
+
   # Detect OS
   OS_TYPE=$(uname -s | tr '[:upper:]' '[:lower:]')
   case "$OS_TYPE" in
@@ -117,7 +117,7 @@ detect_platform() {
       fatal "Unsupported operating system: $OS_TYPE"
       ;;
   esac
-  
+
   # Detect architecture
   ARCH_TYPE=$(uname -m)
   case "$ARCH_TYPE" in
@@ -133,12 +133,12 @@ detect_platform() {
       fatal "Unsupported architecture: $ARCH_TYPE"
       ;;
   esac
-  
+
   # Windows doesn't support arm64 in our releases
   if [ "$OS" = "windows" ] && [ "$ARCH" = "arm64" ]; then
     fatal "Windows ARM64 is not supported"
   fi
-  
+
   success "Detected platform: ${OS}/${ARCH}"
 }
 
@@ -148,28 +148,28 @@ detect_platform() {
 
 get_latest_version() {
   info "Fetching latest version from GitHub..."
-  
+
   if [ -n "$VERSION" ]; then
     # User specified version
     LATEST_VERSION="$VERSION"
     info "Using specified version: $LATEST_VERSION"
     return
   fi
-  
+
   # Query GitHub API
   if [ "$DOWNLOAD_CMD" = "curl" ]; then
     RELEASE_DATA=$(curl -sS "${GITHUB_API}/releases/latest")
   else
     RELEASE_DATA=$(wget -qO- "${GITHUB_API}/releases/latest")
   fi
-  
+
   # Parse tag_name from JSON (simple grep/sed approach for POSIX compatibility)
   LATEST_VERSION=$(echo "$RELEASE_DATA" | grep '"tag_name":' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')
-  
+
   if [ -z "$LATEST_VERSION" ]; then
     fatal "Failed to fetch latest version. You can specify a version manually: VERSION=v1.0.0 $0"
   fi
-  
+
   success "Latest version: $LATEST_VERSION"
 }
 
@@ -186,10 +186,10 @@ get_installed_version() {
 
 check_if_update_needed() {
   CURRENT=$(get_installed_version)
-  
+
   if [ -n "$CURRENT" ]; then
     info "Current version: $CURRENT"
-    
+
     if [ "$CURRENT" = "$LATEST_VERSION" ]; then
       success "Already up to date ($CURRENT)"
       if [ -z "$FORCE" ]; then
@@ -213,9 +213,9 @@ download_file() {
   local url="$1"
   local output="$2"
   local description="$3"
-  
+
   info "Downloading $description..."
-  
+
   if [ "$DOWNLOAD_CMD" = "curl" ]; then
     if [ -n "$VERBOSE" ]; then
       curl -fL --progress-bar -o "$output" "$url"
@@ -229,7 +229,7 @@ download_file() {
       wget -q -O "$output" "$url"
     fi
   fi
-  
+
   if [ ! -f "$output" ] || [ ! -s "$output" ]; then
     # Clean up empty files
     rm -f "$output"
@@ -243,9 +243,9 @@ verify_checksum() {
     warning "Checksum verification skipped (SKIP_VERIFY=1)"
     return
   fi
-  
+
   info "Verifying checksum..."
-  
+
   # Determine which sha256 tool is available
   if command -v sha256sum >/dev/null 2>&1; then
     SHA_CMD="sha256sum"
@@ -256,26 +256,26 @@ verify_checksum() {
     warning "Set SKIP_VERIFY=1 to suppress this warning."
     return
   fi
-  
+
   local expected_checksum=""
-  
+
   if [ "$NAMING_CONVENTION" = "new" ]; then
     # New convention: individual .sha256 files
     local checksum_filename="${ARCHIVE_NAME}.sha256"
     local checksum_url="${GITHUB_RELEASES}/${LATEST_VERSION}/${checksum_filename}"
-    
+
     if download_file "$checksum_url" "$TEMP_DIR/$checksum_filename" "checksum file"; then
       expected_checksum=$(cat "$TEMP_DIR/$checksum_filename" | awk '{print $1}')
     else
       warning "Could not download checksum file. Skipping verification."
       return
     fi
-    
+
   else
     # Legacy convention: single checksums.txt file
     local checksum_filename="${BINARY_NAME}_${LATEST_VERSION#v}_checksums.txt"
     local checksum_url="${GITHUB_RELEASES}/${LATEST_VERSION}/${checksum_filename}"
-    
+
     if download_file "$checksum_url" "$TEMP_DIR/checksums.txt" "checksums list"; then
         local archive_basename=$(basename "$ARCHIVE_FILE")
         expected_checksum=$(grep "$archive_basename" "$TEMP_DIR/checksums.txt" | awk '{print $1}')
@@ -291,21 +291,21 @@ verify_checksum() {
         fi
     fi
   fi
-  
+
   if [ -z "$expected_checksum" ]; then
     warning "Checksum not found for $ARCHIVE_NAME. Skipping verification."
     return
   fi
-  
+
   # Calculate actual checksum
   cd "$TEMP_DIR"
   local actual_checksum=$($SHA_CMD "$ARCHIVE_NAME" | awk '{print $1}')
   cd - >/dev/null
-  
+
   if [ "$expected_checksum" != "$actual_checksum" ]; then
     fatal "Checksum verification failed!\nExpected: $expected_checksum\nActual:   $actual_checksum"
   fi
-  
+
   success "Checksum verified successfully"
 }
 
@@ -315,17 +315,17 @@ verify_checksum() {
 
 download_release() {
   local version_no_v="${LATEST_VERSION#v}"
-  
+
   if [ "$OS" = "windows" ]; then
     ARCHIVE_EXT="zip"
   else
     ARCHIVE_EXT="tar.gz"
   fi
-  
+
   # Try NEW naming convention (easy-commit-linux-x64.tar.gz)
   local NEW_NAME="${BINARY_NAME}-${OS}-${ARCH}.${ARCHIVE_EXT}"
   local NEW_URL="${GITHUB_RELEASES}/${LATEST_VERSION}/${NEW_NAME}"
-  
+
   info "Attempting download with new naming convention..."
   if download_file "$NEW_URL" "$TEMP_DIR/$NEW_NAME" "$NEW_NAME"; then
       ARCHIVE_NAME="$NEW_NAME"
@@ -337,7 +337,7 @@ download_release() {
   # Try LEGACY naming convention (easy-commit_v1.0.0_linux_amd64.tar.gz)
   local LEGACY_NAME="${BINARY_NAME}_${version_no_v}_${OS}_${LEGACY_ARCH}.${ARCHIVE_EXT}"
   local LEGACY_URL="${GITHUB_RELEASES}/${LATEST_VERSION}/${LEGACY_NAME}"
-  
+
   info "New convention failed, trying legacy naming convention..."
   if download_file "$LEGACY_URL" "$TEMP_DIR/$LEGACY_NAME" "$LEGACY_NAME"; then
       ARCHIVE_NAME="$LEGACY_NAME"
@@ -345,24 +345,24 @@ download_release() {
       success "Downloaded release archive (legacy convention)"
       return
   fi
-  
+
   fatal "Failed to download release archive. Tried:\n  - $NEW_URL\n  - $LEGACY_URL"
 }
 
 extract_archive() {
   info "Extracting archive..."
-  
+
   cd "$TEMP_DIR"
-  
+
   if [ "$OS" = "windows" ]; then
     unzip -q "$ARCHIVE_NAME"
   else
     tar -xzf "$ARCHIVE_NAME"
   fi
-  
+
   # The binary inside the archive usually has the platform suffix (e.g., easy-commit-linux-x64)
   # We need to find it and normalize it
-  
+
   if [ "$OS" = "windows" ]; then
     # On Windows, look for .exe files
     # It might be named easy-commit-windows-x64.exe
@@ -397,14 +397,14 @@ extract_archive() {
     fi
     BINARY_PATH="$TEMP_DIR/${BINARY_NAME}"
   fi
-  
+
   if [ ! -f "$BINARY_PATH" ]; then
     fatal "Binary not found after extraction: $BINARY_PATH"
   fi
-  
+
   # Make binary executable
   chmod +x "$BINARY_PATH"
-  
+
   success "Extracted successfully"
   cd - >/dev/null
 }
@@ -416,23 +416,23 @@ determine_install_dir() {
     info "Using custom installation directory: $TARGET_DIR"
     return
   fi
-  
+
   # Try /usr/local/bin first (standard location)
   if [ -w "/usr/local/bin" ] || [ -w "/usr/local" ]; then
     TARGET_DIR="/usr/local/bin"
   else
     # Fallback to user's local bin
     TARGET_DIR="$HOME/.local/bin"
-    
+
     # Create directory if it doesn't exist
     if [ ! -d "$TARGET_DIR" ]; then
       mkdir -p "$TARGET_DIR"
       info "Created directory: $TARGET_DIR"
     fi
-    
+
     warning "Cannot write to /usr/local/bin (permission denied)"
     info "Installing to user directory: $TARGET_DIR"
-    
+
     # Check if directory is in PATH
     case ":$PATH:" in
       *":$TARGET_DIR:"*)
@@ -447,14 +447,14 @@ determine_install_dir() {
 
 install_binary() {
   determine_install_dir
-  
+
   TARGET_PATH="$TARGET_DIR/$BINARY_NAME"
   if [ "$OS" = "windows" ]; then
     TARGET_PATH="${TARGET_PATH}.exe"
   fi
-  
+
   info "Installing to: $TARGET_PATH"
-  
+
   # Copy binary
   if ! cp "$BINARY_PATH" "$TARGET_PATH" 2>/dev/null; then
     # If copy fails, try with sudo
@@ -463,16 +463,16 @@ install_binary() {
       fatal "Failed to install binary. Try running with sudo or set INSTALL_DIR to a writable location."
     fi
   fi
-  
+
   # Ensure it's executable
   chmod +x "$TARGET_PATH" 2>/dev/null || sudo chmod +x "$TARGET_PATH"
-  
+
   success "Binary installed successfully"
 }
 
 verify_installation() {
   info "Verifying installation..."
-  
+
   # If custom INSTALL_DIR is set, verify the binary at that location
   if [ -n "$INSTALL_DIR" ]; then
     if [ -f "$TARGET_PATH" ] && [ -x "$TARGET_PATH" ]; then
@@ -484,7 +484,7 @@ verify_installation() {
     fi
     fatal "Installation verification failed. Binary not found at $TARGET_PATH"
   fi
-  
+
   # Otherwise, check if binary is in PATH
   if ! command -v "$BINARY_NAME" >/dev/null 2>&1; then
     if [ -n "$ADD_TO_PATH" ]; then
@@ -501,14 +501,14 @@ verify_installation() {
     fi
     fatal "Installation verification failed. Binary not found in PATH."
   fi
-  
+
   # Run version check
   INSTALLED=$("$BINARY_NAME" --version 2>/dev/null | head -n 1)
-  
+
   if [ -z "$INSTALLED" ]; then
     fatal "Installation verification failed. Could not run $BINARY_NAME --version"
   fi
-  
+
   success "Installation verified: $INSTALLED"
 }
 
@@ -542,7 +542,7 @@ print_success_message() {
   echo ""
   echo "Installation location: ${MAGENTA}$TARGET_PATH${NC}"
   echo ""
-  
+
   if [ -n "$ADD_TO_PATH" ]; then
     echo "${YELLOW}⚠ Action required:${NC} Add to your PATH"
     echo ""
@@ -550,7 +550,7 @@ print_success_message() {
     echo "  ${CYAN}export PATH=\"\$HOME/.local/bin:\$PATH\"${NC}"
     echo ""
     echo "To make it permanent, add to your shell config:"
-    
+
     if [ -f "$HOME/.bashrc" ]; then
       echo "  ${CYAN}echo 'export PATH=\"\$HOME/.local/bin:\$PATH\"' >> ~/.bashrc${NC}"
     elif [ -f "$HOME/.zshrc" ]; then
@@ -565,7 +565,7 @@ print_success_message() {
     echo "  ${CYAN}${BINARY_NAME}${NC}"
     echo ""
   fi
-  
+
   echo "Documentation:"
   echo "  ${BLUE}https://github.com/${REPO_OWNER}/${REPO_NAME}${NC}"
   echo ""
@@ -606,13 +606,13 @@ main() {
         ;;
     esac
   done
-  
+
   print_banner
-  
+
   # Create temporary directory
   TEMP_DIR=$(mktemp -d)
   trap cleanup EXIT
-  
+
   # Installation steps
   detect_platform
   check_dependencies
@@ -623,7 +623,7 @@ main() {
   extract_archive
   install_binary
   verify_installation
-  
+
   print_success_message
 }
 
