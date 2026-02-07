@@ -28,7 +28,7 @@ A modern CLI application built with TypeScript and Bun to create commits followi
 Install the latest version with a single command (macOS, Linux, WSL):
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/HectorZR/easy-commit/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/HectorZR/easy-commit/main/install.sh | sh
 ```
 
 ### Option 2: Download Pre-built Binary
