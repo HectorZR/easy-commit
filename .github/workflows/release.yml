@@ -18,6 +18,9 @@ jobs:
           - os: ubuntu-latest
             target: linux-x64
             artifact: easy-commit-linux-x64
+          - os: ubuntu-latest
+            target: linux-arm64
+            artifact: easy-commit-linux-arm64
           - os: macos-latest
             target: darwin-x64
             artifact: easy-commit-darwin-x64

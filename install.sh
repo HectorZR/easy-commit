@@ -122,7 +122,7 @@ detect_platform() {
   ARCH_TYPE=$(uname -m)
   case "$ARCH_TYPE" in
     x86_64 | amd64)
-      ARCH="amd64"
+      ARCH="x64"
       ;;
     aarch64 | arm64)
       ARCH="arm64"
@@ -241,9 +241,12 @@ verify_checksum() {
   
   info "Verifying checksum..."
   
-  # Download checksums file
-  local checksums_url="${GITHUB_RELEASES}/${LATEST_VERSION}/${BINARY_NAME}_${LATEST_VERSION#v}_checksums.txt"
-  download_file "$checksums_url" "$TEMP_DIR/checksums.txt" "checksums"
+  # Download checksum file specifically for this archive
+  # GitHub Actions generates individual .sha256 files for each artifact
+  local checksum_filename="${ARCHIVE_NAME}.sha256"
+  local checksum_url="${GITHUB_RELEASES}/${LATEST_VERSION}/${checksum_filename}"
+  
+  download_file "$checksum_url" "$TEMP_DIR/$checksum_filename" "checksum file"
   
   # Determine which sha256 tool is available
   if command -v sha256sum >/dev/null 2>&1; then
@@ -256,18 +259,17 @@ verify_checksum() {
     return
   fi
   
-  # Extract expected checksum for our archive
-  local archive_basename=$(basename "$ARCHIVE_FILE")
-  local expected_checksum=$(grep "$archive_basename" "$TEMP_DIR/checksums.txt" | awk '{print $1}')
+  # Read expected checksum from file (first word)
+  local expected_checksum=$(cat "$TEMP_DIR/$checksum_filename" | awk '{print $1}')
   
   if [ -z "$expected_checksum" ]; then
-    warning "Checksum not found for $archive_basename. Skipping verification."
+    warning "Empty checksum file. Skipping verification."
     return
   fi
   
   # Calculate actual checksum
   cd "$TEMP_DIR"
-  local actual_checksum=$($SHA_CMD "$archive_basename" | awk '{print $1}')
+  local actual_checksum=$($SHA_CMD "$ARCHIVE_NAME" | awk '{print $1}')
   cd - >/dev/null
   
   if [ "$expected_checksum" != "$actual_checksum" ]; then
@@ -283,15 +285,16 @@ verify_checksum() {
 
 download_release() {
   # Construct archive filename based on platform
-  local version_no_v="${LATEST_VERSION#v}"
+  # Format matches GitHub Actions release artifact naming: easy-commit-linux-x64.tar.gz
   
   if [ "$OS" = "windows" ]; then
     ARCHIVE_EXT="zip"
+    ARCHIVE_NAME="${BINARY_NAME}-${OS}-${ARCH}.${ARCHIVE_EXT}"
   else
     ARCHIVE_EXT="tar.gz"
+    ARCHIVE_NAME="${BINARY_NAME}-${OS}-${ARCH}.${ARCHIVE_EXT}"
   fi
   
-  ARCHIVE_NAME="${BINARY_NAME}_${version_no_v}_${OS}_${ARCH}.${ARCHIVE_EXT}"
   ARCHIVE_URL="${GITHUB_RELEASES}/${LATEST_VERSION}/${ARCHIVE_NAME}"
   ARCHIVE_FILE="$TEMP_DIR/$ARCHIVE_NAME"
   
@@ -310,9 +313,41 @@ extract_archive() {
     tar -xzf "$ARCHIVE_NAME"
   fi
   
+  # The binary inside the archive usually has the platform suffix (e.g., easy-commit-linux-x64)
+  # We need to find it and normalize it
+  
   if [ "$OS" = "windows" ]; then
+    # On Windows, look for .exe files
+    # It might be named easy-commit-windows-x64.exe
+    if [ -f "${BINARY_NAME}-${OS}-${ARCH}.exe" ]; then
+        mv "${BINARY_NAME}-${OS}-${ARCH}.exe" "${BINARY_NAME}.exe"
+    elif [ -f "${BINARY_NAME}.exe" ]; then
+        # It's already named correctly
+        :
+    else
+        # Try to find any exe that looks like our binary
+        FOUND_EXE=$(find . -name "${BINARY_NAME}*.exe" | head -n 1)
+        if [ -n "$FOUND_EXE" ]; then
+            mv "$FOUND_EXE" "${BINARY_NAME}.exe"
+        fi
+    fi
     BINARY_PATH="$TEMP_DIR/${BINARY_NAME}.exe"
   else
+    # On Unix, look for the binary
+    # It might be named easy-commit-linux-x64
+    if [ -f "${BINARY_NAME}-${OS}-${ARCH}" ]; then
+        mv "${BINARY_NAME}-${OS}-${ARCH}" "${BINARY_NAME}"
+    elif [ -f "${BINARY_NAME}" ]; then
+        # It's already named correctly
+        :
+    else
+        # Try to find any executable that looks like our binary (excluding the archive itself)
+        # We look for files with execute permission or just the name pattern
+        FOUND_BIN=$(find . -type f ! -name "*.${ARCHIVE_EXT}" ! -name "*.sha256" -name "${BINARY_NAME}*" | head -n 1)
+        if [ -n "$FOUND_BIN" ]; then
+            mv "$FOUND_BIN" "${BINARY_NAME}"
+        fi
+    fi
     BINARY_PATH="$TEMP_DIR/${BINARY_NAME}"
   fi
   
