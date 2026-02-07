@@ -1,10 +1,8 @@
-import React from 'react';
-import { TextInput } from '../components';
-import type { ScreenProps } from '../types';
-import { Box, Text, useInput } from 'ink';
-import { CustomFooter, Header, ProgressBar } from '../components';
-import { text } from '../styles';
 import { InstructionBuilder } from '@domain/instruction-builder';
+import { Box, Text, useInput } from 'ink';
+import { CustomFooter, Header, ProgressBar, TextInput } from '../components';
+import { text } from '../styles';
+import type { ScreenProps } from '../types';
 
 const MAX_LENGTH = 72;
 /**

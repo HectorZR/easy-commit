@@ -1,9 +1,8 @@
+import { InstructionBuilder } from '@domain/instruction-builder';
 import { Box, Text, useInput } from 'ink';
-import React from 'react';
 import { CustomFooter, Header, Options, type OptionType, ProgressBar } from '../components';
 import { colors, text } from '../styles';
 import type { ScreenProps } from '../types';
-import { InstructionBuilder } from '@domain/instruction-builder';
 
 /**
  * Breaking Change Screen - Fifth step of the wizard

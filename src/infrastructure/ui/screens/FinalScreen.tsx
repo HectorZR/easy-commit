@@ -1,10 +1,10 @@
 import { Commit } from '@domain/index';
+import { InstructionBuilder } from '@domain/instruction-builder';
 import { Box, Text, useInput } from 'ink';
 import React from 'react';
-import { Screen, type ScreenProps } from '../types';
 import { CustomFooter, Header, Options, type OptionType, ProgressBar } from '../components';
 import { colors, text } from '../styles';
-import { InstructionBuilder } from '@domain/instruction-builder';
+import { Screen, type ScreenProps } from '../types';
 
 interface FinalScreenProps extends ScreenProps {
   mode: 'preview' | 'confirmation';

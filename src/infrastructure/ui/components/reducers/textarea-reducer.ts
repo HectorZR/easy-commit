@@ -16,7 +16,7 @@ export interface TextareaState {
 export type TextareaAction =
   | { type: 'INSERT'; char: string; width: number; limit?: number }
   | { type: 'DELETE_BEFORE' } // Backspace
-  | { type: 'DELETE_AFTER' }  // Delete
+  | { type: 'DELETE_AFTER' } // Delete
   | { type: 'NEW_LINE'; limit?: number }
   | { type: 'NAVIGATE'; direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' | 'HOME' | 'END' };
 
@@ -61,9 +61,10 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
   switch (action.type) {
     case 'INSERT': {
       const { char, width, limit } = action;
-      
+
       // Check total length limit
-      const currentLength = state.lines.reduce((acc, line) => acc + line.length, 0) + (state.lines.length - 1);
+      const currentLength =
+        state.lines.reduce((acc, line) => acc + line.length, 0) + (state.lines.length - 1);
       if (limit && currentLength >= limit) {
         return state;
       }
@@ -73,7 +74,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
       if (!currentLines[state.cursor.line]) {
         currentLines[state.cursor.line] = '';
       }
-      
+
       const currentLine = currentLines[state.cursor.line];
       const before = currentLine.slice(0, state.cursor.column);
       const after = currentLine.slice(state.cursor.column);
@@ -85,30 +86,30 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
       if (wrappedLines.length > 1) {
         // Line was wrapped
         currentLines.splice(state.cursor.line, 1, ...wrappedLines);
-        
+
         let newCursorLine = state.cursor.line;
         let newCursorCol = state.cursor.column + 1;
-        
+
         // If the insertion point is now in the second line (due to wrap point being before cursor)
         const firstLineLen = wrappedLines[0].length;
-        
+
         if (newCursorCol > firstLineLen) {
-           newCursorLine++;
-           newCursorCol = newCursorCol - firstLineLen; 
-           
-           // If wrap created a trimmed line, we must ensure cursor isn't beyond length
-           const nextLineLen = wrappedLines[1] ? wrappedLines[1].length : 0;
-           if (newCursorCol > nextLineLen) {
-              newCursorCol = nextLineLen; 
-           }
+          newCursorLine++;
+          newCursorCol = newCursorCol - firstLineLen;
+
+          // If wrap created a trimmed line, we must ensure cursor isn't beyond length
+          const nextLineLen = wrappedLines[1] ? wrappedLines[1].length : 0;
+          if (newCursorCol > nextLineLen) {
+            newCursorCol = nextLineLen;
+          }
         }
 
         return {
           lines: currentLines,
           cursor: {
             line: newCursorLine,
-            column: newCursorCol
-          }
+            column: newCursorCol,
+          },
         };
       } else {
         // No wrap needed
@@ -117,8 +118,8 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
           lines: currentLines,
           cursor: {
             line: state.cursor.line,
-            column: state.cursor.column + 1
-          }
+            column: state.cursor.column + 1,
+          },
         };
       }
     }
@@ -133,22 +134,22 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
         const currentLine = currentLines[line];
         const newLine = currentLine.slice(0, column - 1) + currentLine.slice(column);
         currentLines[line] = newLine;
-        
+
         return {
           lines: currentLines,
-          cursor: { line, column: column - 1 }
+          cursor: { line, column: column - 1 },
         };
       } else if (line > 0) {
         // Join with previous line
         const prevLine = currentLines[line - 1];
         const currentLine = currentLines[line];
-        const combinedLine = prevLine + currentLine; 
-        
+        const combinedLine = prevLine + currentLine;
+
         currentLines.splice(line - 1, 2, combinedLine);
-        
+
         return {
           lines: currentLines,
-          cursor: { line: line - 1, column: prevLine.length }
+          cursor: { line: line - 1, column: prevLine.length },
         };
       }
       return state;
@@ -165,7 +166,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
         currentLines[line] = newLine;
         return {
           ...state,
-          lines: currentLines
+          lines: currentLines,
         };
       } else if (line < currentLines.length - 1) {
         // Join with next
@@ -174,7 +175,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
         currentLines.splice(line, 2, combinedLine);
         return {
           ...state,
-          lines: currentLines
+          lines: currentLines,
         };
       }
       return state;
@@ -183,15 +184,16 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
     case 'NEW_LINE': {
       const { limit } = action;
       // Check limit (1 char for newline)
-      const currentLength = state.lines.reduce((acc, line) => acc + line.length, 0) + (state.lines.length - 1);
-       if (limit && currentLength + 1 > limit) {
+      const currentLength =
+        state.lines.reduce((acc, line) => acc + line.length, 0) + (state.lines.length - 1);
+      if (limit && currentLength + 1 > limit) {
         return state;
       }
 
       const { line, column } = state.cursor;
       const currentLines = [...state.lines];
       const currentLine = currentLines[line] || '';
-      
+
       const before = currentLine.slice(0, column);
       const after = currentLine.slice(column);
 
@@ -200,7 +202,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
 
       return {
         lines: currentLines,
-        cursor: { line: line + 1, column: 0 }
+        cursor: { line: line + 1, column: 0 },
       };
     }
 
@@ -218,15 +220,16 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
             column = lines[line].length;
           }
           break;
-        case 'RIGHT':
-           const currentLine = lines[line] || '';
-           if (column < currentLine.length) {
-             column++;
-           } else if (line < lines.length - 1) {
-             line++;
-             column = 0;
-           }
-           break;
+        case 'RIGHT': {
+          const currentLine = lines[line] || '';
+          if (column < currentLine.length) {
+            column++;
+          } else if (line < lines.length - 1) {
+            line++;
+            column = 0;
+          }
+          break;
+        }
         case 'UP':
           if (line > 0) {
             line--;
@@ -251,7 +254,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
 
       return {
         ...state,
-        cursor: { line, column }
+        cursor: { line, column },
       };
     }
 

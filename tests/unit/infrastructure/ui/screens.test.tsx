@@ -1,10 +1,10 @@
 import { describe, expect, mock, test } from 'bun:test';
+import { colors, text } from '@infrastructure/ui/styles';
 import { render } from 'ink-testing-library';
 import React from 'react';
 import { DescriptionInputScreen } from '../../../../src/infrastructure/ui/screens/DescriptionInputScreen';
 import { TypeSelectionScreen } from '../../../../src/infrastructure/ui/screens/TypeSelectionScreen';
 import { Screen, type WizardState } from '../../../../src/infrastructure/ui/types';
-import { colors, text } from '@infrastructure/ui/styles';
 
 describe('TypeSelectionScreen', () => {
   const mockState: WizardState = {

@@ -1,5 +1,4 @@
 import { Box, Text, useInput } from 'ink';
-import React from 'react';
 import { useEffect, useState } from 'react';
 import { text } from '../styles';
 
@@ -29,7 +28,7 @@ export function TextInput({
     if (cursorOffset > internalValue.length) {
       setCursorOffset(internalValue.length);
     }
-  }, [internalValue]);
+  }, [internalValue, cursorOffset]);
 
   useInput((input, key) => {
     if (key.return && onSubmit) {

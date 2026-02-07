@@ -1,5 +1,4 @@
 import { render, useApp } from 'ink';
-import React from 'react';
 import type { Commit } from '../../domain/entities/commit';
 import { useWizardNavigation } from './hooks';
 import {

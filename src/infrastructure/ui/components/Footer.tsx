@@ -1,7 +1,6 @@
-import { Box, Text } from 'ink';
-import React from 'react';
-import { text } from '../styles';
 import { InstructionBuilder } from '@domain/instruction-builder';
+import { Box, Text } from 'ink';
+import { text } from '../styles';
 
 /**
  * Footer component displaying navigation hints

@@ -1,10 +1,9 @@
+import { InstructionBuilder } from '@domain/instruction-builder';
 import { Box, Text, useInput } from 'ink';
-import React from 'react';
 import { useState } from 'react';
 import { CustomFooter, Header, ProgressBar, TextInput, ValidationMessage } from '../components';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
-import { InstructionBuilder } from '@domain/instruction-builder';
 
 const MAX_SCOPE_LENGTH = 20;
 

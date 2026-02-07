@@ -87,7 +87,8 @@ async function main() {
       process.exit(0);
     } else if (error instanceof Error) {
       console.log(text.error(`Error: ${error.message}`));
-      if (logLevel === 0) { // LogLevel.DEBUG
+      if (logLevel === 0) {
+        // LogLevel.DEBUG
         logger.error('Stack trace:', error);
       }
       process.exit(1);
