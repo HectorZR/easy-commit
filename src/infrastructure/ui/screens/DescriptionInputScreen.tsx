@@ -17,8 +17,6 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
   onBack,
   onCancel,
 }) => {
-  const currentChars = state.description.length;
-
   useInput((input, key) => {
     if (key.escape) {
       onCancel();

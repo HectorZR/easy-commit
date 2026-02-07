@@ -12,7 +12,6 @@ const MAX_LENGTH = 500;
  * Allows user to optionally enter a longer commit body
  */
 export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, onCancel }) => {
-  const [body, setBody] = useState(state.body || '');
   const [errors, setErrors] = useState<string[]>([]);
 
   useInput((input, key) => {
@@ -58,8 +57,7 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
         </Text>
         <Box marginBottom={1}>
           <TextareaInput
-            value={body}
-            onChange={setBody}
+            initialValue={state.body || ''}
             onSubmit={handleSubmit}
             placeholder="Detailed explanation... (optional)"
             width={60}

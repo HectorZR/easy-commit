@@ -18,9 +18,7 @@ export type TextareaAction =
   | { type: 'DELETE_BEFORE' } // Backspace
   | { type: 'DELETE_AFTER' }  // Delete
   | { type: 'NEW_LINE'; limit?: number }
-  | { type: 'NAVIGATE'; direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' | 'HOME' | 'END' }
-  | { type: 'SET_CURSOR'; cursor: Cursor }
-  | { type: 'SYNC_VALUE'; value: string }; // External sync
+  | { type: 'NAVIGATE'; direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' | 'HOME' | 'END' };
 
 /**
  * Hard wrap logic: splits a line at the given width boundary
@@ -253,30 +251,6 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
 
       return {
         ...state,
-        cursor: { line, column }
-      };
-    }
-
-    case 'SET_CURSOR':
-      return {
-        ...state,
-        cursor: action.cursor
-      };
-
-    case 'SYNC_VALUE': {
-      const newLines = action.value.split('\n');
-      const maxLine = Math.max(0, newLines.length - 1);
-      
-      let { line, column } = state.cursor;
-      if (line > maxLine) {
-        line = maxLine;
-        column = newLines[line].length;
-      } else if (column > newLines[line].length) {
-        column = newLines[line].length;
-      }
-      
-      return {
-        lines: newLines,
         cursor: { line, column }
       };
     }
