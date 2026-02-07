@@ -12,7 +12,7 @@ async function main() {
   let commit = 'none';
   try {
     commit = await $`git rev-parse --short HEAD`.text().then((s) => s.trim());
-  } catch (error) {
+  } catch (_error) {
     console.warn('Warning: Could not get git commit hash');
   }
 

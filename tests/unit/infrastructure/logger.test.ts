@@ -42,7 +42,7 @@ describe('Logger', () => {
     beforeEach(() => {
       logOutput = [];
       originalConsoleError = console.error;
-      console.error = (...args: any[]) => {
+      console.error = (...args: unknown[]) => {
         logOutput.push(args.join(' '));
       };
     });

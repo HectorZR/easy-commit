@@ -1,5 +1,5 @@
 import { Box, Text, useInput } from 'ink';
-import React, { useReducer } from 'react';
+import { useReducer } from 'react';
 import { text } from '../styles';
 import { textareaReducer } from './reducers/textarea-reducer';
 

@@ -13,10 +13,10 @@ export enum LogLevel {
  * Logger interface for dependency injection
  */
 export interface Logger {
-  debug(message: string, ...args: any[]): void;
-  info(message: string, ...args: any[]): void;
-  warn(message: string, ...args: any[]): void;
-  error(message: string, ...args: any[]): void;
+  debug(message: string, ...args: unknown[]): void;
+  info(message: string, ...args: unknown[]): void;
+  warn(message: string, ...args: unknown[]): void;
+  error(message: string, ...args: unknown[]): void;
   setLevel(level: LogLevel): void;
 }
 
@@ -27,25 +27,25 @@ export interface Logger {
 export class ConsoleLogger implements Logger {
   constructor(private level: LogLevel = LogLevel.SILENT) {}
 
-  debug(message: string, ...args: any[]): void {
+  debug(message: string, ...args: unknown[]): void {
     if (this.level <= LogLevel.DEBUG) {
       this.log('DEBUG', message, ...args);
     }
   }
 
-  info(message: string, ...args: any[]): void {
+  info(message: string, ...args: unknown[]): void {
     if (this.level <= LogLevel.INFO) {
       this.log('INFO', message, ...args);
     }
   }
 
-  warn(message: string, ...args: any[]): void {
+  warn(message: string, ...args: unknown[]): void {
     if (this.level <= LogLevel.WARN) {
       this.log('WARN', message, ...args);
     }
   }
 
-  error(message: string, ...args: any[]): void {
+  error(message: string, ...args: unknown[]): void {
     if (this.level <= LogLevel.ERROR) {
       this.log('ERROR', message, ...args);
     }
@@ -54,7 +54,7 @@ export class ConsoleLogger implements Logger {
   /**
    * Internal log method that formats and writes to stderr
    */
-  private log(level: string, message: string, ...args: any[]): void {
+  private log(level: string, message: string, ...args: unknown[]): void {
     const timestamp = new Date().toISOString();
     console.error(`[${level}] ${timestamp} ${message}`, ...args);
   }

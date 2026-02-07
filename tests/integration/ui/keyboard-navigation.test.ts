@@ -143,7 +143,7 @@ describe('Keyboard Navigation Integration', () => {
       ];
 
       // All screens should allow canceling
-      for (const screen of allScreens) {
+      for (const _screen of allScreens) {
         const canCancel = true; // All screens support Escape
         expect(canCancel).toBe(true);
       }

@@ -15,6 +15,9 @@
       },
       "style": {
         "useConst": "error"
+      },
+      "complexity": {
+        "noStaticOnlyClass": "off"
       }
     }
   },

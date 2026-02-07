@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, mock, test } from 'bun:test';
+import { beforeEach, describe, expect, test } from 'bun:test';
 import { Commit } from '../../../src/domain/entities/commit';
 import type { WizardState } from '../../../src/infrastructure/ui/types';
 import { Screen } from '../../../src/infrastructure/ui/types';
@@ -220,7 +220,6 @@ describe('TUI Integration Tests', () => {
 
       // Verify each screen leads to the next
       for (let i = 0; i < expectedOrder.length - 1; i++) {
-        const currentScreen = expectedOrder[i];
         const nextScreen = expectedOrder[i + 1];
 
         expect(nextScreen).toBeDefined();
