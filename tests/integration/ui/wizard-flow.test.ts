@@ -220,7 +220,7 @@ describe('TUI Integration Tests', () => {
 
       // Verify each screen leads to the next
       for (let i = 0; i < expectedOrder.length - 1; i++) {
-        const nextScreen = expectedOrder[i + 1];
+        const nextScreen = expectedOrder[i + 1]!;
 
         expect(nextScreen).toBeDefined();
         // This verifies the screens are in the correct order

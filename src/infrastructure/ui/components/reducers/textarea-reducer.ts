@@ -75,7 +75,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
         currentLines[state.cursor.line] = '';
       }
 
-      const currentLine = currentLines[state.cursor.line];
+      const currentLine = currentLines[state.cursor.line] ?? '';
       const before = currentLine.slice(0, state.cursor.column);
       const after = currentLine.slice(state.cursor.column);
       const newLine = before + char + after;
@@ -91,7 +91,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
         let newCursorCol = state.cursor.column + 1;
 
         // If the insertion point is now in the second line (due to wrap point being before cursor)
-        const firstLineLen = wrappedLines[0].length;
+        const firstLineLen = wrappedLines[0]?.length ?? 0;
 
         if (newCursorCol > firstLineLen) {
           newCursorLine++;
@@ -131,7 +131,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
 
       if (column > 0) {
         // Delete within line
-        const currentLine = currentLines[line];
+        const currentLine = currentLines[line] ?? '';
         const newLine = currentLine.slice(0, column - 1) + currentLine.slice(column);
         currentLines[line] = newLine;
 
@@ -141,8 +141,8 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
         };
       } else if (line > 0) {
         // Join with previous line
-        const prevLine = currentLines[line - 1];
-        const currentLine = currentLines[line];
+        const prevLine = currentLines[line - 1] ?? '';
+        const currentLine = currentLines[line] ?? '';
         const combinedLine = prevLine + currentLine;
 
         currentLines.splice(line - 1, 2, combinedLine);
@@ -159,7 +159,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
       // Delete key
       const { line, column } = state.cursor;
       const currentLines = [...state.lines];
-      const currentLine = currentLines[line];
+      const currentLine = currentLines[line] ?? '';
 
       if (column < currentLine.length) {
         const newLine = currentLine.slice(0, column) + currentLine.slice(column + 1);
@@ -217,7 +217,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
             column--;
           } else if (line > 0) {
             line--;
-            column = lines[line].length;
+            column = lines?.[line]?.length ?? 0;
           }
           break;
         case 'RIGHT': {
@@ -233,7 +233,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
         case 'UP':
           if (line > 0) {
             line--;
-            column = Math.min(column, lines[line].length);
+            column = Math.min(column, lines?.[line]?.length ?? 0);
           }
           break;
         case 'DOWN':
@@ -248,7 +248,7 @@ export function textareaReducer(state: TextareaState, action: TextareaAction): T
           column = 0;
           break;
         case 'END':
-          column = lines[line]?.length || 0;
+          column = lines[line]?.length ?? 0;
           break;
       }
 
