@@ -123,9 +123,11 @@ detect_platform() {
   case "$ARCH_TYPE" in
     x86_64 | amd64)
       ARCH="x64"
+      LEGACY_ARCH="amd64"
       ;;
     aarch64 | arm64)
       ARCH="arm64"
+      LEGACY_ARCH="arm64"
       ;;
     *)
       fatal "Unsupported architecture: $ARCH_TYPE"
@@ -216,9 +218,9 @@ download_file() {
   
   if [ "$DOWNLOAD_CMD" = "curl" ]; then
     if [ -n "$VERBOSE" ]; then
-      curl -L --progress-bar -o "$output" "$url"
+      curl -fL --progress-bar -o "$output" "$url"
     else
-      curl -sSL -o "$output" "$url"
+      curl -fsL -o "$output" "$url"
     fi
   else
     if [ -n "$VERBOSE" ]; then
@@ -228,9 +230,12 @@ download_file() {
     fi
   fi
   
-  if [ ! -f "$output" ]; then
-    fatal "Failed to download $description"
+  if [ ! -f "$output" ] || [ ! -s "$output" ]; then
+    # Clean up empty files
+    rm -f "$output"
+    return 1
   fi
+  return 0
 }
 
 verify_checksum() {
@@ -240,13 +245,6 @@ verify_checksum() {
   fi
   
   info "Verifying checksum..."
-  
-  # Download checksum file specifically for this archive
-  # GitHub Actions generates individual .sha256 files for each artifact
-  local checksum_filename="${ARCHIVE_NAME}.sha256"
-  local checksum_url="${GITHUB_RELEASES}/${LATEST_VERSION}/${checksum_filename}"
-  
-  download_file "$checksum_url" "$TEMP_DIR/$checksum_filename" "checksum file"
   
   # Determine which sha256 tool is available
   if command -v sha256sum >/dev/null 2>&1; then
@@ -259,11 +257,43 @@ verify_checksum() {
     return
   fi
   
-  # Read expected checksum from file (first word)
-  local expected_checksum=$(cat "$TEMP_DIR/$checksum_filename" | awk '{print $1}')
+  local expected_checksum=""
+  
+  if [ "$NAMING_CONVENTION" = "new" ]; then
+    # New convention: individual .sha256 files
+    local checksum_filename="${ARCHIVE_NAME}.sha256"
+    local checksum_url="${GITHUB_RELEASES}/${LATEST_VERSION}/${checksum_filename}"
+    
+    if download_file "$checksum_url" "$TEMP_DIR/$checksum_filename" "checksum file"; then
+      expected_checksum=$(cat "$TEMP_DIR/$checksum_filename" | awk '{print $1}')
+    else
+      warning "Could not download checksum file. Skipping verification."
+      return
+    fi
+    
+  else
+    # Legacy convention: single checksums.txt file
+    local checksum_filename="${BINARY_NAME}_${LATEST_VERSION#v}_checksums.txt"
+    local checksum_url="${GITHUB_RELEASES}/${LATEST_VERSION}/${checksum_filename}"
+    
+    if download_file "$checksum_url" "$TEMP_DIR/checksums.txt" "checksums list"; then
+        local archive_basename=$(basename "$ARCHIVE_FILE")
+        expected_checksum=$(grep "$archive_basename" "$TEMP_DIR/checksums.txt" | awk '{print $1}')
+    else
+        # Try fallback name: checksums.txt
+        local fallback_url="${GITHUB_RELEASES}/${LATEST_VERSION}/checksums.txt"
+        if download_file "$fallback_url" "$TEMP_DIR/checksums.txt" "checksums list"; then
+            local archive_basename=$(basename "$ARCHIVE_FILE")
+            expected_checksum=$(grep "$archive_basename" "$TEMP_DIR/checksums.txt" | awk '{print $1}')
+        else
+            warning "Could not download checksums list. Skipping verification."
+            return
+        fi
+    fi
+  fi
   
   if [ -z "$expected_checksum" ]; then
-    warning "Empty checksum file. Skipping verification."
+    warning "Checksum not found for $ARCHIVE_NAME. Skipping verification."
     return
   fi
   
@@ -273,7 +303,7 @@ verify_checksum() {
   cd - >/dev/null
   
   if [ "$expected_checksum" != "$actual_checksum" ]; then
-    fatal "Checksum verification failed!\nExpected: $expected_checksum\nActual: $actual_checksum"
+    fatal "Checksum verification failed!\nExpected: $expected_checksum\nActual:   $actual_checksum"
   fi
   
   success "Checksum verified successfully"
@@ -284,22 +314,39 @@ verify_checksum() {
 # =============================================================================
 
 download_release() {
-  # Construct archive filename based on platform
-  # Format matches GitHub Actions release artifact naming: easy-commit-linux-x64.tar.gz
+  local version_no_v="${LATEST_VERSION#v}"
   
   if [ "$OS" = "windows" ]; then
     ARCHIVE_EXT="zip"
-    ARCHIVE_NAME="${BINARY_NAME}-${OS}-${ARCH}.${ARCHIVE_EXT}"
   else
     ARCHIVE_EXT="tar.gz"
-    ARCHIVE_NAME="${BINARY_NAME}-${OS}-${ARCH}.${ARCHIVE_EXT}"
   fi
   
-  ARCHIVE_URL="${GITHUB_RELEASES}/${LATEST_VERSION}/${ARCHIVE_NAME}"
-  ARCHIVE_FILE="$TEMP_DIR/$ARCHIVE_NAME"
+  # Try NEW naming convention (easy-commit-linux-x64.tar.gz)
+  local NEW_NAME="${BINARY_NAME}-${OS}-${ARCH}.${ARCHIVE_EXT}"
+  local NEW_URL="${GITHUB_RELEASES}/${LATEST_VERSION}/${NEW_NAME}"
   
-  download_file "$ARCHIVE_URL" "$ARCHIVE_FILE" "$ARCHIVE_NAME"
-  success "Downloaded release archive"
+  info "Attempting download with new naming convention..."
+  if download_file "$NEW_URL" "$TEMP_DIR/$NEW_NAME" "$NEW_NAME"; then
+      ARCHIVE_NAME="$NEW_NAME"
+      NAMING_CONVENTION="new"
+      success "Downloaded release archive (new convention)"
+      return
+  fi
+
+  # Try LEGACY naming convention (easy-commit_v1.0.0_linux_amd64.tar.gz)
+  local LEGACY_NAME="${BINARY_NAME}_${version_no_v}_${OS}_${LEGACY_ARCH}.${ARCHIVE_EXT}"
+  local LEGACY_URL="${GITHUB_RELEASES}/${LATEST_VERSION}/${LEGACY_NAME}"
+  
+  info "New convention failed, trying legacy naming convention..."
+  if download_file "$LEGACY_URL" "$TEMP_DIR/$LEGACY_NAME" "$LEGACY_NAME"; then
+      ARCHIVE_NAME="$LEGACY_NAME"
+      NAMING_CONVENTION="legacy"
+      success "Downloaded release archive (legacy convention)"
+      return
+  fi
+  
+  fatal "Failed to download release archive. Tried:\n  - $NEW_URL\n  - $LEGACY_URL"
 }
 
 extract_archive() {
