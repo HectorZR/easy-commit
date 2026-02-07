@@ -4,6 +4,7 @@ import React from 'react';
 import { DescriptionInputScreen } from '../../../../src/infrastructure/ui/screens/DescriptionInputScreen';
 import { TypeSelectionScreen } from '../../../../src/infrastructure/ui/screens/TypeSelectionScreen';
 import { Screen, type WizardState } from '../../../../src/infrastructure/ui/types';
+import { colors, text } from '@infrastructure/ui/styles';
 
 describe('TypeSelectionScreen', () => {
   const mockState: WizardState = {
@@ -104,7 +105,8 @@ describe('DescriptionInputScreen', () => {
     );
     const output = lastFrame();
 
-    expect(output).toContain('Characters: ✓ 0/72');
+    expect(output).toContain(text.hint('Characters: '));
+    expect(output).toContain(text.success('0/72'));
   });
 
   test('should show progress bar at step 2', () => {
@@ -167,6 +169,7 @@ describe('DescriptionInputScreen', () => {
 
     // Character counter should reflect existing description
     const currentLength = 'existing description'.length;
-    expect(output).toContain(`Characters: ✓ ${currentLength}/72`);
+    expect(output).toContain(text.hint('Characters: '));
+    expect(output).toContain(text.success(`${currentLength}/72`));
   });
 });
