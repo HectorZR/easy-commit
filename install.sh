@@ -15,7 +15,7 @@ BINARY_NAME="easy-commit"
 
 # GitHub URLs
 GITHUB_API="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}"
-GITHUB_RELEASES="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag"
+GITHUB_RELEASES="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download"
 
 # Colors for output
 if [ -t 1 ]; then
