@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+*.bun-build
 
 # Test binary, built with `go test -c`
 *.test
@@ -21,6 +22,7 @@ go.work
 # IDE and editor files
 .vscode/
 .idea/
+.zed/
 *.swp
 *.swo
 *~
@@ -57,7 +59,6 @@ profile.out
 
 # Go mod download cache
 /pkg/
-/src/
 
 # Application binary
 easy-commit
@@ -73,3 +74,12 @@ easy-commit.yml
 # Release artifacts
 releases/
 artifacts/
+
+# TypeScript / Bun specific
+node_modules/
+*.js
+*.js.map
+!*.config.js
+bun.lockb
+coverage/
+.turbo/

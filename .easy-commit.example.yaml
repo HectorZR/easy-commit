@@ -1,24 +1,41 @@
-# Easy Commit Configuration File
-# Copy this to .easy-commit.yaml and customize as needed
+# Easy Commit Configuration Example
+# Copy this file to .easy-commit.yaml and modify as needed
 
-# Commit message constraints
+# Commit validation rules
 commit:
-  max_description_length: 72    # Maximum characters for commit description
-  max_body_line_length: 72      # Maximum characters per line in body
-  max_body_length: 500          # Maximum total characters in body
-  invalid_scope_chars: " \t\n()" # Characters not allowed in scope
+  # Maximum length for commit description (default: 72)
+  maxDescriptionLength: 72
 
-# Timeouts for various operations
+  # Maximum length for commit body (default: 500)
+  maxBodyLength: 500
+
+  # Characters not allowed in commit description (default: empty array)
+  invalidChars: []
+  # Example: ['@', '#', '$']
+
+# Timeout configurations (in milliseconds)
 timeouts:
-  validation: 2s      # Timeout for commit validation
-  user_input: 30s     # Timeout waiting for user input
-  git_command: 5s     # Timeout for git commands
-  context: 5m         # Overall context timeout
+  # Timeout for validation operations (default: 5000ms = 5s)
+  validation: 5000
 
-# Validator settings
+  # Timeout for git commands (default: 5000ms = 5s)
+  gitCommand: 5000
+
+  # Timeout for user input in TUI (default: 300000ms = 5min)
+  userInput: 300000
+
+  # Timeout for context operations (default: 60000ms = 1min)
+  context: 60000
+
+# Validator configuration
 validator:
-  worker_count: 4     # Number of concurrent validation workers
+  # Number of concurrent validation workers (default: 4)
+  # Range: 1-16
+  workers: 4
 
-# Logger settings
+# Logger configuration
 logger:
-  level: INFO         # Log level: DEBUG, INFO, WARN, ERROR, SILENT
+  # Log level: DEBUG, INFO, WARN, ERROR, SILENT (default: INFO)
+  level: SILENT
+  # Use DEBUG for troubleshooting
+  # Use SILENT to disable logging
