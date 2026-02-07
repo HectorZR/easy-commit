@@ -5,10 +5,6 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
-    inputs:
-      tag_name:
-        description: 'Tag to release (e.g. v2.0.4)'
-        required: true
 
 permissions:
   contents: write
@@ -135,34 +131,19 @@ jobs:
 
       - name: Generate changelog
         id: changelog
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           echo "## What's Changed" > CHANGELOG.md
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-             # For manual dispatch, we might not have the tag checked out as HEAD, 
-             # but let's try to generate a changelog from the latest tag if possible, 
-             # or just use a generic message since we can't easily determine the "previous" tag dynamicially without complex logic.
-             # Better approach: Just list commits since the LAST tag on this branch.
-             git fetch --tags
-             LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-             if [ -n "$LATEST_TAG" ]; then
-                git log $LATEST_TAG..HEAD --pretty=format:"- %s (%h)" >> CHANGELOG.md
-             else
-                git log --pretty=format:"- %s (%h)" -n 20 >> CHANGELOG.md
-             fi
-          else
-             git log $(git describe --tags --abbrev=0 HEAD^)..HEAD --pretty=format:"- %s (%h)" >> CHANGELOG.md
-          fi
+          git log $(git describe --tags --abbrev=0 HEAD^)..HEAD --pretty=format:"- %s (%h)" >> CHANGELOG.md
           cat CHANGELOG.md
 
       - name: Create Release
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
           files: release/*
           body_path: CHANGELOG.md
           draft: false
-          prerelease: ${{ contains(github.event.inputs.tag_name || github.ref_name, 'alpha') || contains(github.event.inputs.tag_name || github.ref_name, 'beta') || contains(github.event.inputs.tag_name || github.ref_name, 'rc') }}
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
