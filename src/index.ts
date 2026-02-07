@@ -9,20 +9,20 @@ import { ConfigLoader } from './infrastructure/config/config-loader';
 import { GitExecutor } from './infrastructure/git/git-executor';
 import { ConsoleLogger, parseLogLevel } from './infrastructure/logger/logger';
 import { runInteractiveTUI } from './infrastructure/ui/App';
-import { VERSION } from './version';
+import { getVersionString } from './version';
 
 async function main() {
   // 1. Load configuration
   const config = ConfigLoader.loadOrDefault();
 
   // 2. Parse CLI arguments
-  const parser = new CliParser('easy-commit', VERSION);
+  const parser = new CliParser('easy-commit', getVersionString());
   const cliConfig = parser.parse(process.argv);
 
   // 3. Initialize logger
   const logLevel = parseLogLevel(config.logger.level);
   const logger = new ConsoleLogger(logLevel);
-  logger.info(`Starting easy-commit v${VERSION}`);
+  logger.info(`Starting easy-commit v${getVersionString()}`);
 
   // 4. Initialize dependencies
   const gitRepo = new GitExecutor(logger);
@@ -52,7 +52,7 @@ async function main() {
 
       console.log();
       await service.createCommit(commit);
-      console.log('\n✓ Commit created successfully!');
+      console.log(text.success('\nCommit created successfully!'));
     } else {
       // Direct mode
       logger.info('Running in direct mode');

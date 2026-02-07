@@ -33,7 +33,7 @@ export function Options({ title, options, titleColor }: OptionsProps) {
       <Text>{titleColor ? titleColor(title) : text.label(title)}</Text>
       {options.map((option, index) => {
         const isSelected = index === selected;
-        return <Option {...option} selected={isSelected} key={option.label} />;
+        return <Option selected={isSelected} key={option.label} {...option} />;
       })}
     </Box>
   );
