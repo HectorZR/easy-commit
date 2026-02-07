@@ -87,20 +87,17 @@ describe('Commit', () => {
       expect(formatted).toContain('BREAKING CHANGE:');
     });
 
-    test('should wrap long body text at 72 characters', () => {
+    test('should preserve body formatting without wrapping', () => {
       const longBody =
-        'This is a very long body text that should be wrapped at 72 characters to maintain readability in git logs and other tools that display commit messages.';
+        'This is a very long body text that should NOT be wrapped at 72 characters.\nIt should preserve newlines\nand formatting exactly as entered by the user.';
       const commit = new Commit('feat', 'add feature', undefined, longBody);
       const formatted = commit.format();
-      const lines = formatted.split('\n');
 
-      // Check that each body line (excluding header and blank lines) is <= 72 chars
-      const bodyLines = lines.slice(2); // Skip header and blank line
-      for (const line of bodyLines) {
-        if (line.trim().length > 0 && !line.startsWith('BREAKING CHANGE:')) {
-          expect(line.length).toBeLessThanOrEqual(72);
-        }
-      }
+      expect(formatted).toContain(
+        'This is a very long body text that should NOT be wrapped at 72 characters.'
+      );
+      expect(formatted).toContain('It should preserve newlines');
+      expect(formatted).toContain('and formatting exactly as entered by the user.');
     });
   });
 

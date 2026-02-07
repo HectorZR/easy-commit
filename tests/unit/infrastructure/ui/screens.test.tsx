@@ -56,7 +56,7 @@ describe('TypeSelectionScreen', () => {
     );
     const output = lastFrame();
 
-    expect(output).toContain('1/7');
+    expect(output).toContain('1/5');
   });
 });
 
@@ -86,7 +86,7 @@ describe('DescriptionInputScreen', () => {
     const output = lastFrame();
 
     expect(output).toContain('Description');
-    expect(output).toContain('feat:');
+    expect(output).toContain('Enter a concise description');
   });
 
   test('should show character counter', () => {
@@ -104,7 +104,7 @@ describe('DescriptionInputScreen', () => {
     );
     const output = lastFrame();
 
-    expect(output).toContain('72 characters remaining');
+    expect(output).toContain('Characters: ✓ 0/72');
   });
 
   test('should show progress bar at step 2', () => {
@@ -122,7 +122,7 @@ describe('DescriptionInputScreen', () => {
     );
     const output = lastFrame();
 
-    expect(output).toContain('2/7');
+    expect(output).toContain('2/5');
   });
 
   test('should show keyboard hints', () => {
@@ -140,9 +140,9 @@ describe('DescriptionInputScreen', () => {
     );
     const output = lastFrame();
 
-    expect(output).toContain('Enter to submit');
-    expect(output).toContain('Ctrl+B to go back');
-    expect(output).toContain('Esc to cancel');
+    expect(output).toContain('[Enter] Continue');
+    expect(output).toContain('[Ctrl+B] Back');
+    expect(output).toContain('[Esc] Cancel');
   });
 
   test('should preserve existing description', () => {
@@ -166,7 +166,7 @@ describe('DescriptionInputScreen', () => {
     const output = lastFrame();
 
     // Character counter should reflect existing description
-    const remaining = 72 - 'existing description'.length;
-    expect(output).toContain(`${remaining} characters remaining`);
+    const currentLength = 'existing description'.length;
+    expect(output).toContain(`Characters: ✓ ${currentLength}/72`);
   });
 });

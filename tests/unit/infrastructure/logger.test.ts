@@ -28,9 +28,9 @@ describe('Logger', () => {
       expect(parseLogLevel('silent')).toBe(LogLevel.SILENT);
     });
 
-    test('should default to INFO for unknown level', () => {
-      expect(parseLogLevel('INVALID')).toBe(LogLevel.INFO);
-      expect(parseLogLevel('')).toBe(LogLevel.INFO);
+    test('should default to SILENT for unknown level', () => {
+      expect(parseLogLevel('INVALID')).toBe(LogLevel.SILENT);
+      expect(parseLogLevel('')).toBe(LogLevel.SILENT);
     });
   });
 

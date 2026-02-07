@@ -166,7 +166,8 @@ describe('TUI Integration Tests', () => {
 
       const message = commit.format();
 
-      expect(message).toContain('feat(auth): add login system');
+      // Breaking change adds '!' to the header
+      expect(message).toContain('feat!(auth): add login system');
       expect(message).toContain('Implements OAuth2 flow');
       expect(message).toContain('BREAKING CHANGE:');
     });

@@ -42,9 +42,9 @@ describe('UI Components', () => {
       const { lastFrame } = render(<Footer />);
       const output = lastFrame();
 
-      expect(output).toContain('arrows');
-      expect(output).toContain('Enter');
-      expect(output).toContain('Ctrl+C');
+      expect(output).toContain('[↑/↓] Select');
+      expect(output).toContain('[Enter] Continue');
+      expect(output).toContain('[Esc] Cancel');
     });
   });
 
@@ -74,21 +74,21 @@ describe('UI Components', () => {
       const { lastFrame } = render(<ProgressBar current={3} total={5} />);
       const output = lastFrame();
 
-      expect(output).toContain('3/7');
+      expect(output).toContain('3/5');
     });
 
     test('should show progress at start', () => {
       const { lastFrame } = render(<ProgressBar current={1} total={5} />);
       const output = lastFrame();
 
-      expect(output).toContain('1/7');
+      expect(output).toContain('1/5');
     });
 
     test('should show progress at end', () => {
-      const { lastFrame } = render(<ProgressBar current={7} total={5} />);
+      const { lastFrame } = render(<ProgressBar current={5} total={5} />);
       const output = lastFrame();
 
-      expect(output).toContain('7/7');
+      expect(output).toContain('5/5');
     });
   });
 

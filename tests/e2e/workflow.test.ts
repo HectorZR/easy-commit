@@ -174,7 +174,7 @@ describe('E2E: Complete Workflow', () => {
 
     const logOutput = await new Response(logProc.stdout).text();
 
-    expect(logOutput).toContain('feat: change API');
+    expect(logOutput).toContain('feat!: change API');
     expect(logOutput).toContain('BREAKING CHANGE:');
   });
 

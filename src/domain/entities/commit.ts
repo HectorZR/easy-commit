@@ -70,25 +70,11 @@ export class Commit {
   }
 
   /**
-   * Wraps body text at 72 characters
+   * Returns the body text as-is, preserving user formatting.
+   * Automatic wrapping has been disabled to respect manual line breaks.
    */
   private wrapBody(text: string): string {
-    const maxWidth = 72;
-    const words = text.split(/\s+/);
-    const lines: string[] = [];
-    let currentLine = '';
-
-    for (const word of words) {
-      if (currentLine.length + word.length + 1 <= maxWidth) {
-        currentLine += (currentLine ? ' ' : '') + word;
-      } else {
-        if (currentLine) lines.push(currentLine);
-        currentLine = word;
-      }
-    }
-    if (currentLine) lines.push(currentLine);
-
-    return lines.join('\n');
+    return text;
   }
 
   isBreaking(): boolean {
