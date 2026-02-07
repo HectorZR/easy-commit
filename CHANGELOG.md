@@ -1,5 +1,11 @@
 # easy-commit
 
+## 2.0.1
+
+### Patch Changes
+
+- 8bbc441: fix: update install script for compatibility with new release artifacts
+
 ## 2.0.0
 
 ### Major Changes
