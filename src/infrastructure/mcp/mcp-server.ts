@@ -1,9 +1,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { CommitService } from '../../application/services/commit-service';
+import type { CommitService } from '../../application/services/commit-service';
 import { Commit } from '../../domain/entities/commit';
-import { Logger } from '../logger/logger';
+import type { Logger } from '../logger/logger';
 
 /**
  * MCP Server implementation for easy-commit

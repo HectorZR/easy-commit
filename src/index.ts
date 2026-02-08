@@ -29,7 +29,7 @@ async function main() {
   // Determine if we need silent mode for GitExecutor (only for MCP mode)
   const isMcpMode = cliConfig.mcp;
   const gitRepo = new GitExecutor(logger, { silent: isMcpMode });
-  
+
   const validator = createDefaultValidator(config);
   const service = new CommitService(gitRepo, validator, logger, config);
 

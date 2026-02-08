@@ -9,6 +9,7 @@ export interface CliConfig {
   scope?: string;
   breaking: boolean;
   interactive: boolean;
+  dryRun: boolean;
   mcp: boolean;
 }
 

@@ -82,8 +82,8 @@ export class GitExecutor implements GitRepository {
       if (exitCode !== 0) {
         // If silent, we might want to capture stderr to throw a better error
         if (this.options.silent && proc.stderr) {
-           const stderr = await new Response(proc.stderr).text();
-           throw new Error(`Git commit failed: ${stderr}`);
+          const stderr = await new Response(proc.stderr).text();
+          throw new Error(`Git commit failed: ${stderr}`);
         }
         throw new Error(`Git commit failed with exit code ${exitCode}`);
       }
