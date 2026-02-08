@@ -1,5 +1,11 @@
 # easy-commit
 
+## 2.1.0
+
+### Minor Changes
+
+- 0639bc2: feat: add MCP server capabilities
+
 ## 2.0.5
 
 ### Patch Changes
