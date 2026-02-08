@@ -10,6 +10,7 @@ export interface CliConfig {
   breaking: boolean;
   interactive: boolean;
   dryRun: boolean;
+  mcp: boolean;
 }
 
 /**
@@ -40,6 +41,7 @@ export class CliParser {
       .option('-b, --breaking', 'mark as breaking change', false)
       .option('-i, --interactive', 'force interactive mode', false)
       .option('--dry-run', 'preview commit without creating it', false)
+      .option('--mcp', 'start MCP server mode', false)
       .addHelpText(
         'after',
         `
@@ -48,6 +50,7 @@ Examples:
   $ easy-commit -t feat -m "add login"   # Direct mode
   $ easy-commit -t fix -m "fix bug" -s auth --breaking
   $ easy-commit --dry-run -t feat -m "test"
+  $ easy-commit --mcp                    # Start MCP server mode
 
 Commit Types:
   feat     - A new feature
@@ -78,6 +81,7 @@ Commit Types:
       breaking: opts.breaking || false,
       interactive: opts.interactive || false,
       dryRun: opts.dryRun || false,
+      mcp: opts.mcp || false,
     };
   }
 
