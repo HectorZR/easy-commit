@@ -1,5 +1,11 @@
 # easy-commit
 
+## 2.1.1
+
+### Patch Changes
+
+- 2d04ab0: fix: scope length warning
+
 ## 2.1.0
 
 ### Minor Changes
