@@ -71,6 +71,7 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
             onSubmit={handleSubmit}
             placeholder="auth, api, ui, etc. (press Enter to skip)"
             limit={MAX_SCOPE_LENGTH}
+            alertLimit={5}
           />
         </Box>
       </Box>

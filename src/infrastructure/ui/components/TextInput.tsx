@@ -7,6 +7,7 @@ interface TextInputProps {
   onSubmit?: (value: string) => void;
   placeholder?: string;
   limit?: number;
+  alertLimit?: number;
 }
 
 /**
@@ -18,6 +19,7 @@ export function TextInput({
   placeholder = '',
   onSubmit,
   limit,
+  alertLimit,
 }: TextInputProps) {
   const [internalValue, setInternalValue] = useState(initialValue);
   // Cursor position (index in the string)
@@ -79,7 +81,7 @@ export function TextInput({
   });
 
   return (
-    <CharactersLeft current={internalValue.length} limit={limit}>
+    <CharactersLeft current={internalValue.length} limit={limit} alertLimit={alertLimit}>
       <Text>
         {text.value(internalValue.slice(0, cursorOffset))}
         {cursorOffset === internalValue.length ? (
@@ -101,13 +103,12 @@ export function TextInput({
   );
 }
 
-interface CharactersLeftProps {
+interface CharactersLeftProps extends Pick<TextInputProps, 'limit' | 'alertLimit'> {
   current: number;
-  limit?: number;
   children?: React.ReactNode;
 }
 
-function CharactersLeft({ current, limit, children }: CharactersLeftProps) {
+function CharactersLeft({ current, limit, alertLimit = 15, children }: CharactersLeftProps) {
   if (!limit) {
     return <Box flexDirection="column">{children}</Box>;
   }
@@ -118,7 +119,7 @@ function CharactersLeft({ current, limit, children }: CharactersLeftProps) {
       <Box marginTop={1}>
         <Text>
           {text.hint('Characters: ')}
-          {current > limit - 15
+          {current > limit - alertLimit
             ? text.warning(`${current}/${limit}`)
             : text.success(`${current}/${limit}`)}
         </Text>
