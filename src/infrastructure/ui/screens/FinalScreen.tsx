@@ -1,5 +1,5 @@
 import { Commit } from '@domain/index';
-import { InstructionBuilder } from '@domain/instruction-builder';
+import { InstructionBuilder } from '../utils/instruction-builder';
 import { Box, Text, useInput } from 'ink';
 import { CustomFooter, Header, Options, type OptionType, ProgressBar } from '../components';
 import { colors, text } from '../styles';
@@ -9,7 +9,7 @@ interface FinalScreenProps extends ScreenProps {
   mode: 'preview' | 'confirmation';
 }
 
-export function FinalScreen({ state, onNext, onBack, onCancel, mode }: FinalScreenProps) {
+export function FinalScreen({ state, onNext, onBack, onCancel, mode, currentStep, totalSteps }: FinalScreenProps) {
   const commit = new Commit(
     state.type,
     state.description,
@@ -52,7 +52,7 @@ export function FinalScreen({ state, onNext, onBack, onCancel, mode }: FinalScre
           </Text>
         }
       >
-        <ProgressBar current={5} total={5} />
+        <ProgressBar current={currentStep} total={totalSteps} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1} gap={1}>

@@ -1,5 +1,6 @@
-import { InstructionBuilder } from '@domain/instruction-builder';
-import { Box, Text, useInput } from 'ink';
+import { InstructionBuilder } from '../utils/instruction-builder';
+import { Box, Text } from 'ink';
+import { useScreenNavigation } from '../hooks';
 import { CustomFooter, Header, ProgressBar, TextInput } from '../components';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
@@ -14,14 +15,10 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
   onNext,
   onBack,
   onCancel,
+  currentStep,
+  totalSteps,
 }) => {
-  useInput((input, key) => {
-    if (key.escape) {
-      onCancel();
-    } else if (key.ctrl && input === 'b') {
-      onBack();
-    }
-  });
+  useScreenNavigation(onBack, onCancel);
 
   const handleSubmit = (value: string) => {
     const trimmed = value.trim();
@@ -44,7 +41,7 @@ export const DescriptionInputScreen: React.FC<ScreenProps> = ({
         title="📝 Easy Commit - Description"
         subtitle={<Text>{text.label('Enter a concise description:')}</Text>}
       >
-        <ProgressBar current={2} total={5} />
+        <ProgressBar current={currentStep} total={totalSteps} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1} gap={1}>

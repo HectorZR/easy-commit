@@ -106,8 +106,8 @@ describe('ConcurrentValidator', () => {
     });
 
     test('should have all default rules registered', () => {
-      // Default validator should have 8 rules
-      expect(defaultValidator.getRuleCount()).toBe(8);
+      // Default validator should have 7 rules (scope format+length merged into one)
+      expect(defaultValidator.getRuleCount()).toBe(7);
     });
 
     describe('description validation', () => {
@@ -233,7 +233,7 @@ describe('ConcurrentValidator', () => {
         const result = await defaultValidator.validate(commit);
 
         expect(result.valid).toBe(false);
-        expect(result.errors.some((e) => e.includes('Invalid scope format'))).toBe(true);
+        expect(result.errors.some((e) => e.includes('lowercase letters, numbers, and hyphens'))).toBe(true);
       });
 
       test('should reject scope with special characters', async () => {

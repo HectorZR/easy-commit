@@ -28,7 +28,7 @@ async function main() {
   // 4. Initialize dependencies
   // Determine if we need silent mode for GitExecutor (only for MCP mode)
   const isMcpMode = cliConfig.mcp;
-  const gitRepo = new GitExecutor(logger, { silent: isMcpMode });
+  const gitRepo = new GitExecutor(logger, { silent: isMcpMode, timeout: config.timeouts.gitCommand });
 
   const validator = createDefaultValidator(config);
   const service = new CommitService(gitRepo, validator, logger, config);

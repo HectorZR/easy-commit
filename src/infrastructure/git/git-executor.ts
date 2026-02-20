@@ -9,6 +9,11 @@ export interface GitExecutorOptions {
    * Default: false (inherit stdout)
    */
   silent?: boolean;
+  /**
+   * Timeout in milliseconds for git commands.
+   * Default: 5000ms
+   */
+  timeout?: number;
 }
 
 /**
@@ -16,10 +21,38 @@ export interface GitExecutorOptions {
  * to execute git commands.
  */
 export class GitExecutor implements GitRepository {
+  private readonly timeout: number;
+
   constructor(
     private logger: Logger,
     private options: GitExecutorOptions = {}
-  ) {}
+  ) {
+    this.timeout = options.timeout ?? 5000;
+  }
+
+  /**
+   * Runs a spawned process with a timeout. Kills the process if the timeout
+   * is exceeded and throws an error.
+   */
+  private async waitWithTimeout(
+    proc: ReturnType<typeof spawn>,
+    command: string
+  ): Promise<number> {
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      proc.kill();
+    }, this.timeout);
+
+    const exitCode = await proc.exited;
+    clearTimeout(timer);
+
+    if (timedOut) {
+      throw new Error(`Git command timed out after ${this.timeout}ms: ${command}`);
+    }
+
+    return exitCode;
+  }
 
   /**
    * Checks if the current directory is a git repository
@@ -33,7 +66,7 @@ export class GitExecutor implements GitRepository {
         stderr: 'pipe',
       });
 
-      const exitCode = await proc.exited;
+      const exitCode = await this.waitWithTimeout(proc, 'rev-parse');
       return exitCode === 0;
     } catch (error) {
       this.logger.error('Error checking git repository:', error);
@@ -53,7 +86,7 @@ export class GitExecutor implements GitRepository {
         stderr: 'pipe',
       });
 
-      const exitCode = await proc.exited;
+      const exitCode = await this.waitWithTimeout(proc, 'diff --cached');
       // Exit code 1 means there are changes
       // Exit code 0 means no changes
       return exitCode !== 0;
@@ -77,7 +110,7 @@ export class GitExecutor implements GitRepository {
         stderr: stdioMode,
       });
 
-      const exitCode = await proc.exited;
+      const exitCode = await this.waitWithTimeout(proc, 'commit');
 
       if (exitCode !== 0) {
         // If silent, we might want to capture stderr to throw a better error
@@ -107,6 +140,7 @@ export class GitExecutor implements GitRepository {
         stderr: 'pipe',
       });
 
+      await this.waitWithTimeout(proc, 'log');
       const output = await new Response(proc.stdout).text();
       return output.trim();
     } catch (error) {

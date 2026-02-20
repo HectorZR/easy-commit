@@ -1,6 +1,7 @@
-import { InstructionBuilder } from '@domain/instruction-builder';
-import { Box, Text, useInput } from 'ink';
+import { InstructionBuilder } from '../utils/instruction-builder';
+import { Box, Text } from 'ink';
 import { useState } from 'react';
+import { useScreenNavigation } from '../hooks';
 import { CustomFooter, Header, ProgressBar, TextareaInput, ValidationMessage } from '../components';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
@@ -10,16 +11,10 @@ const MAX_LENGTH = 500;
  * Body Input Screen - Fourth step of the wizard
  * Allows user to optionally enter a longer commit body
  */
-export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, onCancel }) => {
+export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, onCancel, currentStep, totalSteps }) => {
   const [errors, setErrors] = useState<string[]>([]);
 
-  useInput((input, key) => {
-    if (key.escape) {
-      onCancel();
-    } else if (key.ctrl && input === 'b') {
-      onBack();
-    }
-  });
+  useScreenNavigation(onBack, onCancel);
 
   const handleSubmit = (value: string) => {
     const trimmed = value.trim();
@@ -45,7 +40,7 @@ export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, 
         title="📝 Easy Commit - Body"
         subtitle={<Text>{text.label('Enter detailed description (optional):')}</Text>}
       >
-        <ProgressBar current={4} total={5} />
+        <ProgressBar current={currentStep} total={totalSteps} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1} gap={1}>

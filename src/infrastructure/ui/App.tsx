@@ -20,7 +20,7 @@ export async function runInteractiveTUI(): Promise<Commit | null> {
     let wizardState: WizardState | null = null;
 
     const AppWrapper: React.FC = () => {
-      const { state, goNext, goBack } = useWizardNavigation();
+      const { state, goNext, goBack, currentStep, totalSteps } = useWizardNavigation();
       const { exit } = useApp();
 
       // Save state for access outside React
@@ -45,6 +45,8 @@ export async function runInteractiveTUI(): Promise<Commit | null> {
         onNext: handleNext,
         onBack: goBack,
         onCancel: handleCancel,
+        currentStep,
+        totalSteps,
       };
 
       const renderScreen = () => {

@@ -35,6 +35,8 @@ export interface ScreenProps {
   onNext: (updates: Partial<WizardState>) => void;
   onBack: () => void;
   onCancel: () => void;
+  currentStep: number;
+  totalSteps: number;
 }
 
 /**

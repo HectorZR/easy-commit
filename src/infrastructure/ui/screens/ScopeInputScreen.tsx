@@ -1,30 +1,25 @@
-import { InstructionBuilder } from '@domain/instruction-builder';
-import { Box, Text, useInput } from 'ink';
+import { InstructionBuilder } from '../utils/instruction-builder';
+import { Scope } from '@domain/value-objects/scope';
+import { Box, Text } from 'ink';
 import { useState } from 'react';
+import { useScreenNavigation } from '../hooks';
 import { CustomFooter, Header, ProgressBar, TextInput, ValidationMessage } from '../components';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
 
-const MAX_SCOPE_LENGTH = 20;
+const MAX_SCOPE_LENGTH = 30;
 
 /**
  * Scope Input Screen - Third step of the wizard
  * Allows user to optionally enter commit scope
  */
-export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, onCancel }) => {
+export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, onCancel, currentStep, totalSteps }) => {
   const [errors, setErrors] = useState<string[]>([]);
 
-  useInput((input, key) => {
-    if (key.escape) {
-      onCancel();
-    } else if (key.ctrl && input === 'b') {
-      onBack();
-    }
-  });
+  useScreenNavigation(onBack, onCancel);
 
   const handleSubmit = (value: string) => {
     const trimmed = value.trim();
-    const validationErrors: string[] = [];
 
     // Scope is optional, empty is valid
     if (trimmed === '') {
@@ -32,15 +27,9 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
       return;
     }
 
-    // Validate scope format if provided
-    if (!/^[a-z0-9-]+$/.test(trimmed)) {
-      validationErrors.push('Scope must contain only lowercase letters, numbers, and hyphens');
-    } else if (trimmed.length > MAX_SCOPE_LENGTH) {
-      validationErrors.push(`Scope too long (max ${MAX_SCOPE_LENGTH} characters)`);
-    }
-
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
+    const result = Scope.create(trimmed);
+    if (!result.ok) {
+      setErrors([result.error]);
       return;
     }
 
@@ -54,7 +43,7 @@ export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack,
         title="📝 Easy Commit - Scope"
         subtitle={<Text>{text.label('Enter a scope (optional):')}</Text>}
       >
-        <ProgressBar current={3} total={5} />
+        <ProgressBar current={currentStep} total={totalSteps} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} marginBottom={1} gap={1}>

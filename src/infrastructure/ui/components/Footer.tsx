@@ -1,4 +1,4 @@
-import { InstructionBuilder } from '@domain/instruction-builder';
+import { InstructionBuilder } from '../utils/instruction-builder';
 import { Box, Text } from 'ink';
 import { text } from '../styles';
 
