@@ -27,6 +27,7 @@ export async function runInteractiveTUI(): Promise<Commit | null> {
       wizardState = state;
 
       const handleCancel = () => {
+        resolve(null);
         exit();
       };
 
