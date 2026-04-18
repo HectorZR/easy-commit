@@ -23,7 +23,13 @@ describe('TypeSelectionScreen', () => {
     const onCancel = mock(() => {});
 
     const { lastFrame } = render(
-      <TypeSelectionScreen state={mockState} onNext={onNext} onBack={onBack} onCancel={onCancel} {...defaultScreenProps} />
+      <TypeSelectionScreen
+        state={mockState}
+        onNext={onNext}
+        onBack={onBack}
+        onCancel={onCancel}
+        {...defaultScreenProps}
+      />
     );
     const output = lastFrame();
 
@@ -40,7 +46,13 @@ describe('TypeSelectionScreen', () => {
     const onCancel = mock(() => {});
 
     const { lastFrame } = render(
-      <TypeSelectionScreen state={mockState} onNext={onNext} onBack={onBack} onCancel={onCancel} {...defaultScreenProps} />
+      <TypeSelectionScreen
+        state={mockState}
+        onNext={onNext}
+        onBack={onBack}
+        onCancel={onCancel}
+        {...defaultScreenProps}
+      />
     );
     const output = lastFrame();
 
@@ -54,7 +66,13 @@ describe('TypeSelectionScreen', () => {
     const onCancel = mock(() => {});
 
     const { lastFrame } = render(
-      <TypeSelectionScreen state={mockState} onNext={onNext} onBack={onBack} onCancel={onCancel} {...defaultScreenProps} />
+      <TypeSelectionScreen
+        state={mockState}
+        onNext={onNext}
+        onBack={onBack}
+        onCancel={onCancel}
+        {...defaultScreenProps}
+      />
     );
     const output = lastFrame();
 

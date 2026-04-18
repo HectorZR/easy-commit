@@ -9,7 +9,12 @@ import type { ScreenProps } from '../types';
  * Type Selection Screen - First step of the wizard
  * Allows user to select commit type from predefined list
  */
-export const TypeSelectionScreen: React.FC<ScreenProps> = ({ onNext, onCancel, currentStep, totalSteps }) => {
+export const TypeSelectionScreen: React.FC<ScreenProps> = ({
+  onNext,
+  onCancel,
+  currentStep,
+  totalSteps,
+}) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useInput((input, key) => {

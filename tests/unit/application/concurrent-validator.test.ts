@@ -233,7 +233,9 @@ describe('ConcurrentValidator', () => {
         const result = await defaultValidator.validate(commit);
 
         expect(result.valid).toBe(false);
-        expect(result.errors.some((e) => e.includes('lowercase letters, numbers, and hyphens'))).toBe(true);
+        expect(
+          result.errors.some((e) => e.includes('lowercase letters, numbers, and hyphens'))
+        ).toBe(true);
       });
 
       test('should reject scope with special characters', async () => {

@@ -1,6 +1,6 @@
-import { InstructionBuilder } from '../utils/instruction-builder';
 import { Box, Text } from 'ink';
 import { text } from '../styles';
+import { InstructionBuilder } from '../utils/instruction-builder';
 
 /**
  * Footer component displaying navigation hints

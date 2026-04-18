@@ -1,17 +1,24 @@
-import { InstructionBuilder } from '../utils/instruction-builder';
 import { Box, Text } from 'ink';
 import { useState } from 'react';
-import { useScreenNavigation } from '../hooks';
 import { CustomFooter, Header, ProgressBar, TextareaInput, ValidationMessage } from '../components';
+import { useScreenNavigation } from '../hooks';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
+import { InstructionBuilder } from '../utils/instruction-builder';
 
 const MAX_LENGTH = 500;
 /**
  * Body Input Screen - Fourth step of the wizard
  * Allows user to optionally enter a longer commit body
  */
-export const BodyInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, onCancel, currentStep, totalSteps }) => {
+export const BodyInputScreen: React.FC<ScreenProps> = ({
+  state,
+  onNext,
+  onBack,
+  onCancel,
+  currentStep,
+  totalSteps,
+}) => {
   const [errors, setErrors] = useState<string[]>([]);
 
   useScreenNavigation(onBack, onCancel);

@@ -1,11 +1,11 @@
-import { InstructionBuilder } from '../utils/instruction-builder';
 import { Scope } from '@domain/value-objects/scope';
 import { Box, Text } from 'ink';
 import { useState } from 'react';
-import { useScreenNavigation } from '../hooks';
 import { CustomFooter, Header, ProgressBar, TextInput, ValidationMessage } from '../components';
+import { useScreenNavigation } from '../hooks';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
+import { InstructionBuilder } from '../utils/instruction-builder';
 
 const MAX_SCOPE_LENGTH = 30;
 
@@ -13,7 +13,14 @@ const MAX_SCOPE_LENGTH = 30;
  * Scope Input Screen - Third step of the wizard
  * Allows user to optionally enter commit scope
  */
-export const ScopeInputScreen: React.FC<ScreenProps> = ({ state, onNext, onBack, onCancel, currentStep, totalSteps }) => {
+export const ScopeInputScreen: React.FC<ScreenProps> = ({
+  state,
+  onNext,
+  onBack,
+  onCancel,
+  currentStep,
+  totalSteps,
+}) => {
   const [errors, setErrors] = useState<string[]>([]);
 
   useScreenNavigation(onBack, onCancel);

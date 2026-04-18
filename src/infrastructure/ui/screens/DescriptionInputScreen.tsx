@@ -1,9 +1,9 @@
-import { InstructionBuilder } from '../utils/instruction-builder';
 import { Box, Text } from 'ink';
-import { useScreenNavigation } from '../hooks';
 import { CustomFooter, Header, ProgressBar, TextInput } from '../components';
+import { useScreenNavigation } from '../hooks';
 import { text } from '../styles';
 import type { ScreenProps } from '../types';
+import { InstructionBuilder } from '../utils/instruction-builder';
 
 const MAX_LENGTH = 72;
 /**

@@ -1,15 +1,21 @@
-import { InstructionBuilder } from '../utils/instruction-builder';
 import { Box, Text } from 'ink';
-import { useScreenNavigation } from '../hooks';
 import { CustomFooter, Header, Options, type OptionType, ProgressBar } from '../components';
+import { useScreenNavigation } from '../hooks';
 import { colors, text } from '../styles';
 import type { ScreenProps } from '../types';
+import { InstructionBuilder } from '../utils/instruction-builder';
 
 /**
  * Breaking Change Screen - Fifth step of the wizard
  * Asks user if this commit introduces breaking changes
  */
-export const BreakingChangeScreen: React.FC<ScreenProps> = ({ onNext, onBack, onCancel, currentStep, totalSteps }) => {
+export const BreakingChangeScreen: React.FC<ScreenProps> = ({
+  onNext,
+  onBack,
+  onCancel,
+  currentStep,
+  totalSteps,
+}) => {
   const options: OptionType[] = [
     { label: 'Yes', color: colors.success.bold, onSelect: () => onNext({ breaking: true }) },
     { label: 'No', color: colors.error.bold, onSelect: () => onNext({ breaking: false }) },

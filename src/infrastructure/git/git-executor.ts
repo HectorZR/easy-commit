@@ -28,10 +28,7 @@ export class GitExecutor implements GitRepository {
    * Runs a spawned process with a timeout. Kills the process if the timeout
    * is exceeded and throws an error.
    */
-  private async waitWithTimeout(
-    proc: ReturnType<typeof spawn>,
-    command: string
-  ): Promise<number> {
+  private async waitWithTimeout(proc: ReturnType<typeof spawn>, command: string): Promise<number> {
     let timedOut = false;
     const timer = setTimeout(() => {
       timedOut = true;
