@@ -1,5 +1,11 @@
 # easy-commit
 
+## 2.2.0
+
+### Minor Changes
+
+- a7b2bb1: feat: remove MCP server mode, keep only CLI and TUI
+
 ## 2.1.1
 
 ### Patch Changes
