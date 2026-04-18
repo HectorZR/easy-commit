@@ -9,7 +9,12 @@ import type { ScreenProps } from '../types';
  * Type Selection Screen - First step of the wizard
  * Allows user to select commit type from predefined list
  */
-export const TypeSelectionScreen: React.FC<ScreenProps> = ({ onNext, onCancel }) => {
+export const TypeSelectionScreen: React.FC<ScreenProps> = ({
+  onNext,
+  onCancel,
+  currentStep,
+  totalSteps,
+}) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useInput((input, key) => {
@@ -33,7 +38,7 @@ export const TypeSelectionScreen: React.FC<ScreenProps> = ({ onNext, onCancel })
         title="📝 Easy Commit - Commit Type"
         subtitle={<Text>{text.label('Select a commit type:')}</Text>}
       >
-        <ProgressBar current={1} total={5} />
+        <ProgressBar current={currentStep} total={totalSteps} />
       </Header>
 
       <Box flexDirection="column" marginTop={1} gap={1}>

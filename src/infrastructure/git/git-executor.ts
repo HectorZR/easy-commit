@@ -4,11 +4,10 @@ import type { Logger } from '../logger/logger';
 
 export interface GitExecutorOptions {
   /**
-   * If true, git output will be piped instead of inherited.
-   * This is crucial for MCP server mode to prevent stdout pollution.
-   * Default: false (inherit stdout)
+   * Timeout in milliseconds for git commands.
+   * Default: 5000ms
    */
-  silent?: boolean;
+  timeout?: number;
 }
 
 /**
@@ -16,10 +15,35 @@ export interface GitExecutorOptions {
  * to execute git commands.
  */
 export class GitExecutor implements GitRepository {
+  private readonly timeout: number;
+
   constructor(
     private logger: Logger,
-    private options: GitExecutorOptions = {}
-  ) {}
+    options: GitExecutorOptions = {}
+  ) {
+    this.timeout = options.timeout ?? 5000;
+  }
+
+  /**
+   * Runs a spawned process with a timeout. Kills the process if the timeout
+   * is exceeded and throws an error.
+   */
+  private async waitWithTimeout(proc: ReturnType<typeof spawn>, command: string): Promise<number> {
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      proc.kill();
+    }, this.timeout);
+
+    const exitCode = await proc.exited;
+    clearTimeout(timer);
+
+    if (timedOut) {
+      throw new Error(`Git command timed out after ${this.timeout}ms: ${command}`);
+    }
+
+    return exitCode;
+  }
 
   /**
    * Checks if the current directory is a git repository
@@ -33,7 +57,7 @@ export class GitExecutor implements GitRepository {
         stderr: 'pipe',
       });
 
-      const exitCode = await proc.exited;
+      const exitCode = await this.waitWithTimeout(proc, 'rev-parse');
       return exitCode === 0;
     } catch (error) {
       this.logger.error('Error checking git repository:', error);
@@ -53,7 +77,7 @@ export class GitExecutor implements GitRepository {
         stderr: 'pipe',
       });
 
-      const exitCode = await proc.exited;
+      const exitCode = await this.waitWithTimeout(proc, 'diff --cached');
       // Exit code 1 means there are changes
       // Exit code 0 means no changes
       return exitCode !== 0;
@@ -69,22 +93,15 @@ export class GitExecutor implements GitRepository {
   async commit(message: string): Promise<void> {
     this.logger.info('Executing git commit...');
 
-    const stdioMode = this.options.silent ? 'pipe' : 'inherit';
-
     try {
       const proc = spawn(['git', 'commit', '-m', message], {
-        stdout: stdioMode, // Show git output in real-time unless silent
-        stderr: stdioMode,
+        stdout: 'inherit',
+        stderr: 'inherit',
       });
 
-      const exitCode = await proc.exited;
+      const exitCode = await this.waitWithTimeout(proc, 'commit');
 
       if (exitCode !== 0) {
-        // If silent, we might want to capture stderr to throw a better error
-        if (this.options.silent && proc.stderr) {
-          const stderr = await new Response(proc.stderr).text();
-          throw new Error(`Git commit failed: ${stderr}`);
-        }
         throw new Error(`Git commit failed with exit code ${exitCode}`);
       }
 
@@ -107,6 +124,7 @@ export class GitExecutor implements GitRepository {
         stderr: 'pipe',
       });
 
+      await this.waitWithTimeout(proc, 'log');
       const output = await new Response(proc.stdout).text();
       return output.trim();
     } catch (error) {

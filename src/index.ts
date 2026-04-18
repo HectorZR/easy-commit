@@ -8,7 +8,6 @@ import { CliParser } from './infrastructure/cli/cli-parser';
 import { ConfigLoader } from './infrastructure/config/config-loader';
 import { GitExecutor } from './infrastructure/git/git-executor';
 import { ConsoleLogger, parseLogLevel } from './infrastructure/logger/logger';
-import { EasyCommitMcpServer } from './infrastructure/mcp/mcp-server';
 import { runInteractiveTUI } from './infrastructure/ui/App';
 import { getVersionString } from './version';
 
@@ -26,22 +25,10 @@ async function main() {
   logger.info(`Starting easy-commit v${getVersionString()}`);
 
   // 4. Initialize dependencies
-  // Determine if we need silent mode for GitExecutor (only for MCP mode)
-  const isMcpMode = cliConfig.mcp;
-  const gitRepo = new GitExecutor(logger, { silent: isMcpMode });
+  const gitRepo = new GitExecutor(logger, { timeout: config.timeouts.gitCommand });
 
   const validator = createDefaultValidator(config);
   const service = new CommitService(gitRepo, validator, logger, config);
-
-  // 4.5 Check for MCP mode
-  if (isMcpMode) {
-    // In MCP mode, we don't want standard logging to pollute stdout
-    // as it's used for JSON-RPC communication
-    // We could configure a file logger here if needed
-    const mcpServer = new EasyCommitMcpServer(service, logger);
-    await mcpServer.start();
-    return; // Exit main flow, keep process running for MCP
-  }
 
   // 5. Check git repository
   if (!(await gitRepo.isGitRepository())) {

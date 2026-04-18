@@ -2,6 +2,7 @@ import type { Commit } from '../../domain/entities/commit';
 import { isValidCommitType } from '../../domain/entities/commit-type';
 import type { CommitValidator } from '../../domain/repositories/commit-validator';
 import type { ValidationResult } from '../../domain/types';
+import { Scope } from '../../domain/value-objects/scope';
 import type { Config } from '../../infrastructure/config/config-loader';
 
 type ValidationRule = (commit: Commit) => Promise<string | null>;
@@ -84,20 +85,11 @@ export function createDefaultValidator(config: Config): ConcurrentValidator {
     return null;
   });
 
-  // Rule: Scope format (if provided)
+  // Rule: Scope format and length (if provided)
   validator.addRule(async (commit) => {
-    if (commit.scope && !/^[a-z0-9-]+$/.test(commit.scope)) {
-      return `Invalid scope format: ${commit.scope}. Must be lowercase letters, numbers, and hyphens only`;
-    }
-    return null;
-  });
-
-  // Rule: Scope length (if provided)
-  validator.addRule(async (commit) => {
-    if (commit.scope && commit.scope.length > 30) {
-      return `Scope too long (${commit.scope.length}/30)`;
-    }
-    return null;
+    if (!commit.scope) return null;
+    const result = Scope.create(commit.scope);
+    return result.ok ? null : result.error;
   });
 
   // Rule: Invalid characters in description

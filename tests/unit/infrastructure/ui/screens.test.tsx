@@ -15,13 +15,21 @@ describe('TypeSelectionScreen', () => {
     breaking: false,
   };
 
+  const defaultScreenProps = { currentStep: 1, totalSteps: 7 };
+
   test('should render commit type options', () => {
     const onNext = mock(() => {});
     const onBack = mock(() => {});
     const onCancel = mock(() => {});
 
     const { lastFrame } = render(
-      <TypeSelectionScreen state={mockState} onNext={onNext} onBack={onBack} onCancel={onCancel} />
+      <TypeSelectionScreen
+        state={mockState}
+        onNext={onNext}
+        onBack={onBack}
+        onCancel={onCancel}
+        {...defaultScreenProps}
+      />
     );
     const output = lastFrame();
 
@@ -38,7 +46,13 @@ describe('TypeSelectionScreen', () => {
     const onCancel = mock(() => {});
 
     const { lastFrame } = render(
-      <TypeSelectionScreen state={mockState} onNext={onNext} onBack={onBack} onCancel={onCancel} />
+      <TypeSelectionScreen
+        state={mockState}
+        onNext={onNext}
+        onBack={onBack}
+        onCancel={onCancel}
+        {...defaultScreenProps}
+      />
     );
     const output = lastFrame();
 
@@ -52,11 +66,17 @@ describe('TypeSelectionScreen', () => {
     const onCancel = mock(() => {});
 
     const { lastFrame } = render(
-      <TypeSelectionScreen state={mockState} onNext={onNext} onBack={onBack} onCancel={onCancel} />
+      <TypeSelectionScreen
+        state={mockState}
+        onNext={onNext}
+        onBack={onBack}
+        onCancel={onCancel}
+        {...defaultScreenProps}
+      />
     );
     const output = lastFrame();
 
-    expect(output).toContain('1/5');
+    expect(output).toContain('1/7');
   });
 });
 
@@ -70,6 +90,8 @@ describe('DescriptionInputScreen', () => {
     breaking: false,
   };
 
+  const defaultScreenProps = { currentStep: 2, totalSteps: 7 };
+
   test('should render description input', () => {
     const onNext = mock(() => {});
     const onBack = mock(() => {});
@@ -81,6 +103,7 @@ describe('DescriptionInputScreen', () => {
         onNext={onNext}
         onBack={onBack}
         onCancel={onCancel}
+        {...defaultScreenProps}
       />
     );
     const output = lastFrame();
@@ -100,6 +123,7 @@ describe('DescriptionInputScreen', () => {
         onNext={onNext}
         onBack={onBack}
         onCancel={onCancel}
+        {...defaultScreenProps}
       />
     );
     const output = lastFrame();
@@ -119,11 +143,12 @@ describe('DescriptionInputScreen', () => {
         onNext={onNext}
         onBack={onBack}
         onCancel={onCancel}
+        {...defaultScreenProps}
       />
     );
     const output = lastFrame();
 
-    expect(output).toContain('2/5');
+    expect(output).toContain('2/7');
   });
 
   test('should show keyboard hints', () => {
@@ -137,6 +162,7 @@ describe('DescriptionInputScreen', () => {
         onNext={onNext}
         onBack={onBack}
         onCancel={onCancel}
+        {...defaultScreenProps}
       />
     );
     const output = lastFrame();
@@ -162,6 +188,7 @@ describe('DescriptionInputScreen', () => {
         onNext={onNext}
         onBack={onBack}
         onCancel={onCancel}
+        {...defaultScreenProps}
       />
     );
     const output = lastFrame();
