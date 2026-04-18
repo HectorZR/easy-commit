@@ -1,10 +1,12 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag del release (ej: v2.3.0). Debe existir en el repo.'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -35,6 +37,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -50,7 +54,7 @@ jobs:
       - name: Build standalone binary
         run: bun run build:standalone
         env:
-          VERSION: ${{ github.ref_name }}
+          VERSION: ${{ github.event.inputs.tag }}
           BUILT_BY: github-actions
 
       - name: Rename binary (Unix)
@@ -115,6 +119,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.inputs.tag }}
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -128,24 +133,23 @@ jobs:
 
       - name: Prepare release files
         run: |
-          # No need to copy/find, artifacts are already in release/ thanks to merge-multiple
           ls -lh release/
 
       - name: Generate changelog
         id: changelog
-        if: startsWith(github.ref, 'refs/tags/')
         run: |
           echo "## What's Changed" > CHANGELOG.md
-          git log $(git describe --tags --abbrev=0 HEAD^)..HEAD --pretty=format:"- %s (%h)" >> CHANGELOG.md
+          git log $(git describe --tags --abbrev=0 ${{ github.event.inputs.tag }}^)...${{ github.event.inputs.tag }} --pretty=format:"- %s (%h)" >> CHANGELOG.md || \
+          git log --pretty=format:"- %s (%h)" -20 >> CHANGELOG.md
           cat CHANGELOG.md
 
       - name: Create Release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.inputs.tag }}
           files: release/*
           body_path: CHANGELOG.md
           draft: false
-          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+          prerelease: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') || contains(github.event.inputs.tag, 'rc') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
