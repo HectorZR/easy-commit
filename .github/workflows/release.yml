@@ -65,6 +65,12 @@ jobs:
         if: runner.os == 'Windows'
         run: mv easy-commit.exe ${{ matrix.artifact }}
 
+      - name: Sign binary (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          xattr -cr ${{ matrix.artifact }}
+          codesign --sign - --force ${{ matrix.artifact }}
+
       - name: Create archive (Unix)
         if: runner.os != 'Windows'
         run: |
