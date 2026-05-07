@@ -48,13 +48,21 @@ async function main() {
     });
     console.log('✅ Build complete!\n');
 
-    // 4. Show binary info
+    // 4. Sign binary (required on macOS Apple Silicon)
+    if (process.platform === 'darwin') {
+      console.log('🔐 Signing binary (ad-hoc)...');
+      await $`xattr -cr ${binaryName}`;
+      await $`codesign --sign - --force ${binaryName}`;
+      console.log('✅ Binary signed\n');
+    }
+
+    // 5. Show binary info
     const stats = await Bun.file(binaryName).stat();
     const sizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
     console.log(`📊 Binary size: ${sizeInMB} MB`);
     console.log(`📁 Output: ./${binaryName}\n`);
 
-    // 5. Test the binary
+    // 6. Test the binary
     console.log('🧪 Testing binary...');
     const testResult = await $`./${binaryName} --version`.text();
     console.log(`   Version output: ${testResult.trim()}`);

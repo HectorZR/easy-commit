@@ -8,9 +8,9 @@
   },
   "scripts": {
     "dev": "bun run src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target bun",
+    "build": "bun run scripts/build.ts --outdir dist --target bun",
     "build:standalone": "bun run scripts/build.ts",
-    "build:quick": "bun build src/index.ts --compile --outfile easy-commit",
+    "build:quick": "bun build scripts/build.ts --compile --outfile easy-commit",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",

@@ -25,7 +25,9 @@ async function main() {
   logger.info(`Starting easy-commit v${getVersionString()}`);
 
   // 4. Initialize dependencies
-  const gitRepo = new GitExecutor(logger, { timeout: config.timeouts.gitCommand });
+  const gitRepo = new GitExecutor(logger, {
+    timeout: config.timeouts.gitCommand,
+  });
 
   const validator = createDefaultValidator(config);
   const service = new CommitService(gitRepo, validator, logger, config);
