@@ -1,5 +1,11 @@
 # easy-commit
 
+## 2.3.0
+
+### Minor Changes
+
+- aa72684: fix: macOS compilation signature
+
 ## 2.2.0
 
 ### Minor Changes
